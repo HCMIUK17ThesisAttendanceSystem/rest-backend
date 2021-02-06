@@ -17,15 +17,15 @@ exports.createLecturer = async (req, res, next) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = new User({
+    const lecturer = new Lecturer({
       email,
       password: hashedPassword,
       name
     });
-    const createdUser = await user.save();
+    const createdLecturer = await lecturer.save();
     res.status(201).json({
-      message: 'User created :D',
-      userId: createdUser._id
+      message: 'Lecturer created :D',
+      lecturerId: createdLecturer._id
     });
   } catch (error) {
     checkStatusCode(error, next);
