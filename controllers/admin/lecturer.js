@@ -32,3 +32,19 @@ exports.createLecturer = async (req, res, next) => {
   };
 };
 
+exports.deleteLecturer = async (req, res, next) => {
+  const { lecId } = req.body;
+
+  try {
+    await Lecturer.findByIdAndRemove(lecId);
+
+    // find all courses where lecturer = lecId
+    // remove relation
+
+    res.status(200).json({
+      message: 'Lecturer & courses\' relationships removed'
+    });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};

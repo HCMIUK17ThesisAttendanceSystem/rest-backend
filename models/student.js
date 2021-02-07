@@ -1,23 +1,29 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const lecturerSchema = new Schema({
+const studentSchema = new Schema({
   name: {
     type: String,
     required: true
   },
-  email: {
+  id: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   password: {
     type: String,
     required: true
   },
-  courseIds: [{
+  rfidTag: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  regCourseIds: [{
     type: Schema.Types.ObjectId,
     ref: 'Course'
   }]
 });
 
-module.exports = mongoose.model('Lecturer', lecturerSchema);
+module.exports = mongoose.model('Student', studentSchema);
