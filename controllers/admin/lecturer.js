@@ -1,6 +1,5 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 const Lecturer = require('../../models/lecturer');
 const {
@@ -30,6 +29,18 @@ exports.createLecturer = async (req, res, next) => {
   } catch (error) {
     checkStatusCode(error, next);
   };
+};
+
+exports.getLecturers = async (req, res, next) => {
+  try {
+    const lecturers = await Lecturer.find();
+    res.status(200).json({
+      message: 'Fetched all lecturers :D',
+      lecturers
+    })
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
 };
 
 exports.deleteLecturer = async (req, res, next) => {

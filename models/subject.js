@@ -11,13 +11,13 @@ const subjectSchema = new Schema({
     required: true,
     unique: true
   },
-  credit_theory: {
+  creditTheory: {
     type: Number,
     get: v => Math.round(v),
     set: v => Math.round(v),
     required: true
   },
-  credit_lab: {
+  creditLab: {
     type: Number,
     get: v => Math.round(v),
     set: v => Math.round(v),

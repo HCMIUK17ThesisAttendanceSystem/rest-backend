@@ -11,10 +11,6 @@ const studentSchema = new Schema({
     required: true,
     unique: true
   },
-  password: {
-    type: String,
-    required: true
-  },
   rfidTag: {
     type: String,
     required: true,
