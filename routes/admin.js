@@ -9,6 +9,7 @@ const studentController = require('../controllers/admin/student');
 
 const Admin = require('../models/admin');
 const Lecturer = require('../models/lecturer');
+const Subject = require('../models/subject');
 
 const Router = express.Router();
 
@@ -79,17 +80,15 @@ Router.post('/create-subject',
     body('id')
       .isLength({ min: 8, max: 8 })
       .isAlphanumeric()
-      .notEmpty().trim(),
+      .trim(),
     body('name')
       .isLength({ min: 5 })
       .matches(/^[a-zA-Z0-9 ]/) // Alphanumeric and spaces
-      .notEmpty().trim(), 
+      .trim(),
     body('creditLab')
-      .isInt()
-      .notEmpty(),
+      .isInt({ min: 0 }),
     body('creditTheory')
-      .isInt()
-      .notEmpty()
+      .isInt({ min: 0 })
       .custom((value, { req }) => {
         if (parseInt(value, 10) + parseInt(req.body.creditLab, 10) <= 0) {
           throw new Error('The course has no credit D:');
@@ -105,21 +104,53 @@ Router.post('/create-subject',
 
 // Manage courses
 //________________________________________________________________
-Router.post('/create-course', 
+Router.post('/create-course',
   [
     body('classType')
-      .notEmpty(),
+      .isInt({ min: 0, max: 1 }),
     body('room')
-      .notEmpty().trim()
+      .trim()
       .isLength({ min: 4, max: 6 })
       .matches(/^[A-Z0-9 .]/),
     body('weekday')
-      .notEmpty().trim()
-      .
-  ], 
+      .isInt({ min: 0, max: 6 }),
+    body('periodStart')
+      .isInt({ min: 1, max: 15 }),
+    body('periodEnd')
+      .isInt({ min: 2, max: 16 })
+      .custom((value, { req }) => {
+        if (value < req.body.periodStart) {
+          throw new Error('Start period larger than end period D:');
+        } else {
+          return value;
+        }
+      }),
+    body('subjectId')
+      .custom((value, { req }) => {
+        return Subject.findOne({ email: value }).then(subjectDoc =>
+          !subjectDoc && Promise.reject('Subject doesn\'t exist D:')
+        );
+      }),
+    body('lecturerId')
+      .custom((value, { req }) => {
+        return Lecturer.findOne({ email: value }).then(lecDoc =>
+          !lecDoc && Promise.reject('Lecturer doesn\'t exist D:')
+        );
+      })
+  ],
   courseController.createCourse
 );
+//________________________________________________________________
 
+// Manage students
+//________________________________________________________________
+// POST /admin/create-student
+Router.post('/create-student',
+  [
+    
+  ],
+  studentController.createStudent
+);
 //________________________________________________________________
 
 
