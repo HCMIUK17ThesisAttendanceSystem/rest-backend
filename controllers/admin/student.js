@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 
 const Student = require('../../models/student');
+const RFID = require('../../models/rfid');
 
 const {
   checkStatusCode,
@@ -13,13 +14,14 @@ exports.createStudent = (req, res, next) => {
     throw createError('Validation failed D:', 422, errors.array());
 
   const {
-    name, id, rfidTag
+    name, id, rfidTagId
   } = req.body;
-  const student = new Student({
-    name, id, rfidTag
-  });
 
   try {
+    const rfidTag = await RFID.findOne({ id: rfidTagId });
+    const student = new Student({
+      name, id, rfidTag
+    });
     await student.save();
     res.status(201).json({
       message: 'Created student :D',

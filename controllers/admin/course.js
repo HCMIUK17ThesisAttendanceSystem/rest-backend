@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const Course = require('../../models/course');
 const Subject = require('../../models/subject');
 const Lecturer = require('../../models/lecturer');
+const Student = require('../../models/student');
 
 const {
   checkStatusCode,
@@ -43,6 +44,22 @@ exports.createCourse = async (req, res, next) => {
       lecturer
     });
 
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+exports.updateRegistration = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    throw createError('Validation failed D:', 422, errors.array());
+
+  const { regStudentIds, courseId } = req.body;
+
+  try {
+    const course = await Course.findById(courseId).populate('regStudentIds');
+    console.log(course);
+    res.status(200);
   } catch (error) {
     checkStatusCode(error, next);
   }
