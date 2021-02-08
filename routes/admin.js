@@ -147,11 +147,14 @@ Router.post('/create-course',
 // POST /admin/create-student
 Router.post('/create-student',
   [
-    
+    body('name')
+      .notEmpty().trim(),
+    body('id')
+      .matches(/^[A-Z0-9]/)
+      .trim()
   ],
   studentController.createStudent
 );
 //________________________________________________________________
-
 
 module.exports = Router;
