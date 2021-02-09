@@ -1,6 +1,5 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
 
 const Lecturer = require('../../models/lecturer');
 const {
@@ -8,7 +7,6 @@ const {
   createError
 } = require('../../util/error-handler');
 const {
-  transporter,
   createLecturerEmail
 } = require('../../util/mailer');
 
@@ -28,17 +26,12 @@ exports.createLecturer = async (req, res, next) => {
     });
     const createdLecturer = await lecturer.save();
 
-    const emailOption = createLecturerEmail(email, password, name);
-    const sendEmailResult = await transporter.sendMail(emailOption, (err, info) => {
-      err ?
-        console.log(err) :
-        console.log('Message sent: ' + info.response);
-    });
-    
+    await createLecturerEmail(email, password, name);
+
     res.status(201).json({
       message: 'Lecturer created :D',
       lecturerId: createdLecturer._id,
-      sendEmailResult
+      lecturer
     });
   } catch (error) {
     checkStatusCode(error, next);
@@ -58,11 +51,15 @@ exports.getLecturers = async (req, res, next) => {
 };
 
 exports.deleteLecturer = async (req, res, next) => {
-  const { lecId } = req.body;
-
+  const { lecturerId } = req.params;
+  console.log(req.body);
   try {
-    await Lecturer.findByIdAndRemove(lecId);
+    const lecturer = await Lecturer.findById(lecturerId);
+    
+    if (!lecturer)
+      throw createError('Lecturer not found D:', 404);
 
+    await Lecturer.findByIdAndRemove(lecturerId);
     // find all courses where lecturer = lecId
     // remove relation
 

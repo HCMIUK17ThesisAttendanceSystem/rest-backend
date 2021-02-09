@@ -74,6 +74,9 @@ Router.post('/create-lecturer',
 // GET /admin/lecturers
 Router.get('/lecturers', lecController.getLecturers);
 
+// DELETE /admin/delete-lecturer
+Router.delete('/lecturer/:lecturerId', lecController.deleteLecturer);
+
 //________________________________________________________________
 
 // Manage subjects

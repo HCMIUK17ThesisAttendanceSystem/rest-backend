@@ -37,7 +37,8 @@ mongoose.connect(
   mongooseUri,
   {
     useUnifiedTopology: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useFindAndModify: false
   }
 )
   .then(result => {
