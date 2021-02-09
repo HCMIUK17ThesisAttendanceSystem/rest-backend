@@ -27,7 +27,7 @@ exports.signup = async (req, res, next) => {
     const createdAdmin = await admin.save();
     res.status(201).json({
       message: 'Admin created :D',
-      adminId: createdAdmin._id
+      userId: createdAdmin._id
     });
   } catch (error) {
     checkStatusCode(error, next);
@@ -52,14 +52,14 @@ exports.login = async (req, res, next) => {
     const token = jwt.sign(
       {
         email: admin.email,
-        adminId: admin._id.toString()
+        userId: admin._id.toString()
       },
       'asecretprivatekey',
       { expiresIn: '1h' }
     );
     res.status(200).json({
       token,
-      adminId: admin._id.toString()
+      userId: admin._id.toString()
     });
   } catch (error) {
     checkStatusCode(error, next);

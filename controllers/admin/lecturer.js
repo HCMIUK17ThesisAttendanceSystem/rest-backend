@@ -1,11 +1,16 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 
 const Lecturer = require('../../models/lecturer');
 const {
   checkStatusCode,
   createError
 } = require('../../util/error-handler');
+const {
+  transporter,
+  createLecturerEmail
+} = require('../../util/mailer');
 
 exports.createLecturer = async (req, res, next) => {
   const errors = validationResult(req);
@@ -22,9 +27,18 @@ exports.createLecturer = async (req, res, next) => {
       name
     });
     const createdLecturer = await lecturer.save();
+
+    const emailOption = createLecturerEmail(email, password, name);
+    const sendEmailResult = await transporter.sendMail(emailOption, (err, info) => {
+      err ?
+        console.log(err) :
+        console.log('Message sent: ' + info.response);
+    });
+    
     res.status(201).json({
       message: 'Lecturer created :D',
-      lecturerId: createdLecturer._id
+      lecturerId: createdLecturer._id,
+      sendEmailResult
     });
   } catch (error) {
     checkStatusCode(error, next);

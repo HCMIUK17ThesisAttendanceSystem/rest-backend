@@ -70,6 +70,10 @@ Router.post('/create-lecturer',
   ],
   lecController.createLecturer
 );
+
+// GET /admin/lecturers
+Router.get('/lecturers', lecController.getLecturers);
+
 //________________________________________________________________
 
 // Manage subjects
