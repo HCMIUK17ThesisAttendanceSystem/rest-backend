@@ -2,7 +2,7 @@
 const RFID = require('../../models/rfid');
 const { checkStatusCode } = require('../../util/error-handler');
 
-exports.createRFID = (req, res, next) => {
+exports.createRFID = async (req, res, next) => {
   const { rfidTag } = req.body;
 
   try {

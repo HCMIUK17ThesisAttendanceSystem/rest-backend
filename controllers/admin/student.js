@@ -8,7 +8,7 @@ const {
   createError
 } = require('../../util/error-handler');
 
-exports.createStudent = (req, res, next) => {
+exports.createStudent = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())
     throw createError('Validation failed D:', 422, errors.array());
