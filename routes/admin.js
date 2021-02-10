@@ -1,6 +1,8 @@
 const express = require('express');
 const { body } = require('express-validator');
 
+const isAuth = require('../util/is-auth');
+
 const authController = require('../controllers/admin/auth');
 const lecController = require('../controllers/admin/lecturer');
 const subjectController = require('../controllers/admin/subject');
@@ -51,8 +53,8 @@ Router.post('/login',
 
 // Manage lecturers
 //________________________________________________________________
-// POST /admin/create-lecturer
-Router.post('/create-lecturer',
+// POST /admin/lecturer
+Router.post('/lecturer',
   [
     body('email')
       .isEmail()
@@ -81,11 +83,11 @@ Router.delete('/lecturer/:lecturerId', lecController.deleteLecturer);
 
 // Manage subjects
 //________________________________________________________________
-// POST /admin/create-subject
-Router.post('/create-subject',
+// POST /admin/subject
+Router.post('/subject',
   [
     body('id')
-      .isLength({ min: 8, max: 8 })
+      .isLength({ min: 7, max: 7 })
       .isAlphanumeric()
       .trim(),
     body('name')
@@ -104,9 +106,13 @@ Router.post('/create-subject',
         }
       })
   ],
-  // isAuth,
+  isAuth,
   subjectController.createSubject
 );
+
+// GET /admin/subjects
+Router.get('/subjects', subjectController.getSubjects);
+
 //________________________________________________________________
 
 // Manage courses
