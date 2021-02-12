@@ -12,6 +12,7 @@ const studentController = require('../controllers/admin/student');
 const Admin = require('../models/admin');
 const Lecturer = require('../models/lecturer');
 const Subject = require('../models/subject');
+const { createError } = require('../util/error-handler');
 
 const Router = express.Router();
 
@@ -127,17 +128,26 @@ Router.post('/create-course',
       .matches(/^[A-Z0-9 .]/),
     body('weekday')
       .isInt({ min: 0, max: 6 }),
-    body('periodStart')
-      .isInt({ min: 1, max: 15 }),
-    body('periodEnd')
-      .isInt({ min: 2, max: 16 })
+    body('periods')
+      .isArray({ min: 2, max: 5})
+      .withMessage('Minimun period number is 2, max is 5 D:')
       .custom((value, { req }) => {
-        if (value < req.body.periodStart) {
-          throw new Error('Start period larger than end period D:');
-        } else {
-          return value;
-        }
-      }),
+        if (!value.every(Number.isInteger)) 
+          throw createError('Periods are not Integers', 502);
+        if (value.some((el, idx) => el !== value[idx - 1] + 1))
+          throw createError('Invalid periods\' data', 502);
+      }), // valid periods: [1,2,3]...
+    // body('periodStart')
+    //   .isInt({ min: 1, max: 15 }),
+    // body('periodEnd')
+    //   .isInt({ min: 2, max: 16 })
+    //   .custom((value, { req }) => {
+    //     if (value < req.body.periodStart) {
+    //       throw new Error('Start period larger than end period D:');
+    //     } else {
+    //       return value;
+    //     }
+    //   }),
     body('subjectId')
       .custom((value, { req }) => {
         return Subject.findOne({ email: value }).then(subjectDoc =>

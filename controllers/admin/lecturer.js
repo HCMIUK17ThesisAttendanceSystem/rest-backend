@@ -7,7 +7,8 @@ const {
   createError
 } = require('../../util/error-handler');
 const {
-  createLecturerEmail
+  createLecturerEmail,
+  updateLecturerPasswordEmail
 } = require('../../util/mailer');
 
 exports.createLecturer = async (req, res, next) => {
@@ -36,6 +37,29 @@ exports.createLecturer = async (req, res, next) => {
   } catch (error) {
     checkStatusCode(error, next);
   };
+};
+
+exports.updateLecturerPassword = async (req, res, next) => {
+  const { lecturerId, newPassword } = req.body;
+
+  try {
+    const lecturer = await Lecturer.findById(lecturerId);
+    if (!lecturer)
+      throw createError('Lecturer not found D:', 404);
+
+    const newHashedPassword = bcrypt.hash(newPassword, 12);
+    lecturer.password = newHashedPassword;
+    await lecturer.save();
+
+    await updateLecturerPasswordEmail(lecturer.email, newPassword, lecturer.name);
+
+    res.status(200).json({
+      message: 'Updated lecturer\'s password :D',
+      lecturerId: lecturer._id
+    });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
 };
 
 exports.getLecturers = async (req, res, next) => {

@@ -15,20 +15,28 @@ exports.createCourse = async (req, res, next) => {
   if (!errors.isEmpty())
     throw createError('Validation failed D:', 422, errors.array());
 
-  const { 
-    classType, room, weekday, 
-    periodStart, periodEnd, 
-    lecturerId, subjectId 
+  const {
+    classType, room, weekday,
+    periods,
+    lecturerId, subjectId
   } = req.body;
-  const course = new Course({
-    classType, room, weekday, 
-    periodStart, periodEnd, 
-    lecturerId, subjectId 
-  });
 
   try {
+    const existingCourses = await Course.find({ room, weekday });
+
+    const overlappingCourse = existingCourses.find(course => {
+      course.periods.some(period => periods.includes(period))
+    })
+    if (overlappingCourse)
+      throw createError('Courses are overlapping', 503, overlappingCourse);
+
+    const course = new Course({
+      classType, room, weekday,
+      periods,
+      lecturerId, subjectId
+    });
     await course.save();
-    
+
     const lecturer = await Lecturer.findById(lecturerId);
     lecturer.courses.push(course);
     await lecturer.save();
@@ -43,12 +51,61 @@ exports.createCourse = async (req, res, next) => {
       subject,
       lecturer
     });
-
   } catch (error) {
     checkStatusCode(error, next);
   }
 };
 
+// TODO update overlapping logic
+exports.updateCourse = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    throw createError('Validation failed D:', 422, errors.array());
+
+  const {
+    courseId,
+    classType, room, weekday,
+    periods
+  } = req.body;
+
+  try {
+    const course = await Course.findById(courseId);
+    if (!course)
+      throw createError('Course not found D:', 404);
+
+    course.classType = classType;
+    course.room = room;
+    course.weekday = weekday;
+    course.periods = periods;
+    await course.save();
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+exports.getRegistrations = async (req, res, next) => {
+  const { courseId } = req.body;
+
+  try {
+    const course = await Course.findById(courseId).populate('regStudentIds');
+    if (!course)
+      throw createError('Course not found D:', 404);
+
+    const students = await Student.find();
+    if (!students)
+      throw createError('No student created D:', 503);
+
+    res.status(200).json({
+      message: 'Fetched course\'s student ids :D',
+      regStudents: course.regStudentIds,
+      students: students
+    })
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+// TODO
 exports.updateRegistration = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())

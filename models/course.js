@@ -14,14 +14,10 @@ const courseSchema = new Schema({
     type: String,
     required: true
   },
-  periodStart: {
+  periods: [{
     type: Number,
     required: true
-  },
-  periodEnd: {
-    type: Number,
-    required: true
-  },
+  }],
   lecturerId: {
     type: Schema.Types.ObjectId,
     ref: 'Lecturer',
