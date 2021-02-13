@@ -83,6 +83,67 @@ exports.updateCourse = async (req, res, next) => {
   }
 };
 
+exports.deleteCourse = async (req, res, next) => {
+  const { courseId } = req.body;
+
+  try {
+    const course = await Course.findById(courseId);
+    if (!course)
+      throw createError('Course not found D:', 404);
+
+    await Course.findByIdAndRemove(courseId);
+    res.status(200).json({ message: 'Deleted course :D' });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+exports.getCourse = async (req, res, next) => {
+  const { courseId } = req.body;
+
+  try {
+    const course = await Course.findById(courseId);
+    if (!course)
+      throw createError('Course not found D:', 404);
+
+    res.status(200).json({ message: 'Fetched course :D', course });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+}
+
+exports.getCourses = async (req, res, next) => {
+  try {
+    const courses = await Course.find();
+
+    res.status(200).json({ courses });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+exports.getCoursesByLecturerId = async (req, res, next) => {
+  const { lecturerId } = req.body;
+  try {
+    const courses = await Course.find({ lecturerId });
+
+    res.status(200).json({ courses });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+exports.getCoursesBySubjectId = async (req, res, next) => {
+  const { subjectId } = req.body;
+  try {
+    const courses = await Course.find({ subjectId });
+
+    res.status(200).json({ courses });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
 exports.getRegistrations = async (req, res, next) => {
   const { courseId } = req.body;
 
