@@ -175,9 +175,45 @@ exports.updateRegistration = async (req, res, next) => {
   const { regStudentIds, courseId } = req.body;
 
   try {
-    const course = await Course.findById(courseId).populate('regStudentIds');
-    console.log(course);
-    res.status(200);
+    const course = await Course.findById(courseId);
+    //.populate('regStudentIds');
+
+    // Find 3 types of students
+    // 1. Newly registered (in regIds, not in courseRegIds)
+    const newStudentIds = regStudentIds
+      .filter(id => !course.regStudentIds.includes(id));
+    // 2. Old registered (in regIds, in courseRegIds)
+    const oldRegStudentIds = regStudentIds
+      .filter(id => course.regStudentIds.includes(id));
+    // 3. Drop course (not in regIds, in courseRegIds)
+    const dropStudentIds = course.regStudentIds
+      .filter(id => !regStudentIds.includes(id));
+
+
+    newStudentIds.forEach(id => {
+      const student = await Student.findById(id);
+      if (!student)
+        throw createError('Student not found D:', 404);
+
+      student.regCourses.push(course);
+      await student.save();
+    });
+
+    dropStudentIds.forEach(id => {
+      const student = await Student.findById(id);
+      if (!student)
+        throw createError('Student not found D:', 404);
+
+      student.regCourses.pull(course._id);
+      await student.save();
+    });
+
+    course.regStudentIds = regStudentIds;
+    await course.save();
+
+    res.status(200).json({
+      message: 'Update registrations :D'
+    });
   } catch (error) {
     checkStatusCode(error, next);
   }
