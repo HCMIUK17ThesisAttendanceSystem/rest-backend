@@ -102,7 +102,11 @@ exports.getCourse = async (req, res, next) => {
   const { courseId } = req.body;
 
   try {
-    const course = await Course.findById(courseId);
+    const course = await Course.findById(courseId)
+      .populate('subjectId')
+      .populate('lecturerId', 'name email')
+      .populate('regStudentIds', 'name id')
+      .execPopulate();
     if (!course)
       throw createError('Course not found D:', 404);
 
@@ -114,7 +118,8 @@ exports.getCourse = async (req, res, next) => {
 
 exports.getCourses = async (req, res, next) => {
   try {
-    const courses = await Course.find();
+    const courses = await Course.find()
+      .populate('subjectId', 'name id');
 
     res.status(200).json({ courses });
   } catch (error) {
