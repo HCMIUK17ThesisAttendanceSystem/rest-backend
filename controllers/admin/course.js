@@ -194,8 +194,7 @@ exports.updateRegistration = async (req, res, next) => {
     const dropStudentIds = course.regStudentIds
       .filter(id => !regStudentIds.includes(id));
 
-
-    newStudentIds.forEach(id => {
+    newStudentIds.forEach(async (id) => {
       const student = await Student.findById(id);
       if (!student)
         throw createError('Student not found D:', 404);
@@ -204,7 +203,7 @@ exports.updateRegistration = async (req, res, next) => {
       await student.save();
     });
 
-    dropStudentIds.forEach(id => {
+    dropStudentIds.forEach(async (id) => {
       const student = await Student.findById(id);
       if (!student)
         throw createError('Student not found D:', 404);

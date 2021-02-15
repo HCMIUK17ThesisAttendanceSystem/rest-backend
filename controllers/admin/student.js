@@ -14,11 +14,11 @@ exports.createStudent = async (req, res, next) => {
     throw createError('Validation failed D:', 422, errors.array());
 
   const {
-    name, id, rfidTagId
+    name, id, rfidTag
   } = req.body;
 
   try {
-    const rfidTag = await RFID.findOne({ id: rfidTagId });
+    // const rfidTag = await RFID.findOne({ id: rfidTagId });
     const student = new Student({
       name, id, rfidTag
     });

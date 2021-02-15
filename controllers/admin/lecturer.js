@@ -47,7 +47,7 @@ exports.updateLecturerPassword = async (req, res, next) => {
     if (!lecturer)
       throw createError('Lecturer not found D:', 404);
 
-    const newHashedPassword = bcrypt.hash(newPassword, 12);
+    const newHashedPassword = await bcrypt.hash(newPassword, 12);
     lecturer.password = newHashedPassword;
     await lecturer.save();
 

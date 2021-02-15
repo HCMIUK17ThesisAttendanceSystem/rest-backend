@@ -74,10 +74,19 @@ Router.post('/lecturer',
   lecController.createLecturer
 );
 
+// PUT /admin/lecturer-password
+Router.put('/lecturer-password',
+  [
+    body('newPassword').trim()
+      .isLength({ min: 5 })
+  ],
+  lecController.updateLecturerPassword
+);
+
 // GET /admin/lecturers
 Router.get('/lecturers', lecController.getLecturers);
 
-// DELETE /admin/delete-lecturer
+// DELETE /admin/lecturer
 Router.delete('/lecturer/:lecturerId', lecController.deleteLecturer);
 
 //________________________________________________________________
