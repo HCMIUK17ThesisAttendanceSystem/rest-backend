@@ -172,6 +172,10 @@ Router.post('/create-course',
   ],
   courseController.createCourse
 );
+
+//GET /admin/courses
+Router.get('/courses', courseController.getCourses);
+
 //________________________________________________________________
 
 // Manage students

@@ -119,9 +119,13 @@ exports.getCourse = async (req, res, next) => {
 exports.getCourses = async (req, res, next) => {
   try {
     const courses = await Course.find()
-      .populate('subjectId', 'name id');
+      .populate('subjectId', 'name id')
+      .populate('lecturerId', 'name');
+      
+    const subjects = await Subject.find(null, 'name id');
+    const lecturers = await Lecturer.find(null, 'name');
 
-    res.status(200).json({ courses });
+    res.status(200).json({ courses, subjects, lecturers });
   } catch (error) {
     checkStatusCode(error, next);
   }
