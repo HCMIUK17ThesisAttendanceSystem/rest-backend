@@ -11,18 +11,19 @@ const {
 } = require('../../util/error-handler');
 
 exports.createCourse = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    throw createError('Validation failed D:', 422, errors.array());
-  }
-  const {
-    classType, room, weekday,
-    periods,
-    lecturerId, subjectId
-  } = req.body;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log(errors.array());
+      throw createError('Validation failed D:', 422, errors.array());
+    }
+
+    const {
+      classType, room, weekday,
+      periods,
+      lecturerId, subjectId
+    } = req.body;
+
     const existingCourses = await Course.find({ room, weekday });
 
     const overlappingCourse = existingCourses.find(course => {
@@ -63,17 +64,17 @@ exports.createCourse = async (req, res, next) => {
 
 // TODO update overlapping logic
 exports.updateCourse = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    throw createError('Validation failed D:', 422, errors.array());
-
-  const {
-    courseId,
-    classType, room, weekday,
-    periods
-  } = req.body;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw createError('Validation failed D:', 422, errors.array());
+
+    const {
+      courseId,
+      classType, room, weekday,
+      periods
+    } = req.body;
+
     const course = await Course.findById(courseId);
     if (!course)
       throw createError('Course not found D:', 404);
@@ -182,13 +183,13 @@ exports.getRegistrations = async (req, res, next) => {
 
 // TODO
 exports.updateRegistration = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    throw createError('Validation failed D:', 422, errors.array());
-
-  const { regStudentIds, courseId } = req.body;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw createError('Validation failed D:', 422, errors.array());
+
+    const { regStudentIds, courseId } = req.body;
+
     const course = await Course.findById(courseId);
     //.populate('regStudentIds');
 

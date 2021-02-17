@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 
 app.use('/admin', adminRoutes);
 
-app.use((error, req, res, next) => {
+app.use((error) => {
   console.log(error);
   const status = error.statusCode || 500;
   const message = error.message;
