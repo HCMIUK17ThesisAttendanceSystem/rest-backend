@@ -12,9 +12,10 @@ const {
 
 exports.createCourse = async (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty())
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
     throw createError('Validation failed D:', 422, errors.array());
-
+  }
   const {
     classType, room, weekday,
     periods,
@@ -38,12 +39,16 @@ exports.createCourse = async (req, res, next) => {
     await course.save();
 
     const lecturer = await Lecturer.findById(lecturerId);
-    lecturer.courses.push(course);
+    if (!lecturer)
+      throw createError('Lecturer not found D:', 404);
+    lecturer.courseIds.push(course);
     await lecturer.save();
 
     const subject = await Subject.findById(subjectId);
-    subject.courses.push(course);
-    await subject(save);
+    if (!subject)
+      throw createError('Subject not found D:', 404);
+    subject.courseIds.push(course);
+    await subject.save();
 
     res.status(201).json({
       message: 'Created course :D',
@@ -121,7 +126,7 @@ exports.getCourses = async (req, res, next) => {
     const courses = await Course.find()
       .populate('subjectId', 'name id')
       .populate('lecturerId', 'name');
-      
+
     const subjects = await Subject.find(null, 'name id');
     const lecturers = await Lecturer.find(null, 'name');
 

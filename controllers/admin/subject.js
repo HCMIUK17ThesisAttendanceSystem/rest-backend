@@ -8,9 +8,10 @@ const {
 
 exports.createSubject = async (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty())
-    throw createError('Validation failed D:', 422, errors.array());
-
+  if (!errors.isEmpty()) {
+    console.log(errors.array()[0]);
+    throw createError(errors.array()[0].msg, 422, errors.array());
+  }
   const { id, name, creditLab, creditTheory } = req.body;
   const subject = new Subject({
     id,
@@ -75,7 +76,7 @@ exports.updateSubject = async (req, res, next) => {
     subject.creditLab = creditLab;
     subject.creditTheory = creditTheory;
     await subject.save();
-    
+
     res.status(200).json({
       message: 'Subject updated :D',
       subject
@@ -86,7 +87,7 @@ exports.updateSubject = async (req, res, next) => {
 };
 
 exports.deleteSubject = async (req, res, next) => {
-  const { subjectId } = req.body;
+  const { subjectId } = req.params;
   try {
     const subject = await Subject.findById(subjectId);
     if (!subject)

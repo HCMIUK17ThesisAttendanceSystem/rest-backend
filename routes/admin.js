@@ -13,6 +13,7 @@ const Admin = require('../models/admin');
 const Lecturer = require('../models/lecturer');
 const Subject = require('../models/subject');
 const { createError } = require('../util/error-handler');
+const e = require('express');
 
 const Router = express.Router();
 
@@ -100,34 +101,35 @@ Router.post('/subject',
       .isLength({ min: 7, max: 7 })
       .isAlphanumeric()
       .trim(),
-    body('name')
+    body('name').trim()
       .isLength({ min: 5 })
-      .matches(/^[a-zA-Z0-9 ]/) // Alphanumeric and spaces
-      .trim(),
+      .matches(/^[a-zA-Z0-9 ]/), // Alphanumeric and spaces
     body('creditLab')
-      .isInt({ min: 0 }),
-    body('creditTheory')
       .isInt({ min: 0 })
       .custom((value, { req }) => {
-        if (parseInt(value, 10) + parseInt(req.body.creditLab, 10) <= 0) {
+        if (parseInt(value) + parseInt(req.body.creditTheory) <= 0) {
           throw new Error('The course has no credit D:');
-        } else {
-          return value;
         }
-      })
+        return true;
+      }),
+    body('creditTheory')
+      .isInt({ min: 0 })
   ],
   isAuth,
   subjectController.createSubject
 );
 
 // GET /admin/subjects
-Router.get('/subjects', subjectController.getSubjects);
+Router.get('/subjects', isAuth, subjectController.getSubjects);
+
+// DELETE /admin/subject
+Router.delete('/subject/:subjectId', isAuth, subjectController.deleteSubject);
 
 //________________________________________________________________
 
 // Manage courses
 //________________________________________________________________
-Router.post('/create-course',
+Router.post('/course',
   [
     body('classType')
       .isInt({ min: 0, max: 1 }),
@@ -138,13 +140,17 @@ Router.post('/create-course',
     body('weekday')
       .isInt({ min: 0, max: 6 }),
     body('periods')
-      .isArray({ min: 2, max: 5})
+      .isArray()
       .withMessage('Minimun period number is 2, max is 5 D:')
-      .custom((value, { req }) => {
-        if (!value.every(Number.isInteger)) 
+      .custom((value) => {
+        if (!value.every(Number.isInteger))
           throw createError('Periods are not Integers', 502);
-        if (value.some((el, idx) => el !== value[idx - 1] + 1))
+        if (value.some((el, idx) => idx !== 0 ?
+          el != parseInt(value[idx - 1]) + 1 :
+          el != parseInt(value[value.length - 1]) - parseInt(value.length - 1)
+        ))
           throw createError('Invalid periods\' data', 502);
+        return true;
       }), // valid periods: [1,2,3]...
     // body('periodStart')
     //   .isInt({ min: 1, max: 15 }),
@@ -159,13 +165,13 @@ Router.post('/create-course',
     //   }),
     body('subjectId')
       .custom((value, { req }) => {
-        return Subject.findOne({ email: value }).then(subjectDoc =>
+        return Subject.findById(value).then(subjectDoc =>
           !subjectDoc && Promise.reject('Subject doesn\'t exist D:')
         );
       }),
     body('lecturerId')
       .custom((value, { req }) => {
-        return Lecturer.findOne({ email: value }).then(lecDoc =>
+        return Lecturer.findById(value).then(lecDoc =>
           !lecDoc && Promise.reject('Lecturer doesn\'t exist D:')
         );
       })
