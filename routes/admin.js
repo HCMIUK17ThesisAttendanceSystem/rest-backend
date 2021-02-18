@@ -8,6 +8,7 @@ const lecController = require('../controllers/admin/lecturer');
 const subjectController = require('../controllers/admin/subject');
 const courseController = require('../controllers/admin/course');
 const studentController = require('../controllers/admin/student');
+const rfidController = require('../controllers/admin/rfid');
 
 const Admin = require('../models/admin');
 const Lecturer = require('../models/lecturer');
@@ -196,6 +197,15 @@ Router.post('/create-student',
       .trim()
   ],
   studentController.createStudent
+);
+//________________________________________________________________
+
+// Manage rfids
+//________________________________________________________________
+// GET /admin/new-rfid
+Router.get('/new-rfid',
+  isAuth,
+  rfidController.getNewStudentRfid
 );
 //________________________________________________________________
 

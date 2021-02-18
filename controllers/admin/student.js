@@ -1,7 +1,6 @@
 const { validationResult } = require('express-validator');
 
 const Student = require('../../models/student');
-const RFID = require('../../models/rfid');
 
 const {
   checkStatusCode,
