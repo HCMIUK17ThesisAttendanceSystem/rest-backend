@@ -187,8 +187,8 @@ Router.get('/courses', courseController.getCourses);
 
 // Manage students
 //________________________________________________________________
-// POST /admin/create-student
-Router.post('/create-student',
+// POST /admin/student
+Router.post('/student',
   [
     body('name')
       .notEmpty().trim(),
@@ -198,6 +198,9 @@ Router.post('/create-student',
   ],
   studentController.createStudent
 );
+
+//GET /admin/students
+Router.get('/students', isAuth, studentController.getStudents);
 //________________________________________________________________
 
 // Manage rfids
