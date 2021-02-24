@@ -1,6 +1,7 @@
 const RFID = require('../../models/rfid');
 const NewStudentRfid = require('../../models/newStudentRfid');
 const { checkStatusCode } = require('../../util/error-handler');
+const io = require('../../util/socket');
 
 // for checking connection
 exports.hello = (req, res, next) => {
@@ -48,6 +49,10 @@ exports.createStudentRFID = async (req, res, next) => {
       await newRfid.save();
       updateRfidTag = newRfid;
     }
+    io.getIO().emit('new-rfid', {
+      action: 'update',
+      rfidTag: updateRfidTag.rfidTag
+    })
     res.status(200).json({ updateRfidTag });
   } catch (error) {
     checkStatusCode(error, next);
