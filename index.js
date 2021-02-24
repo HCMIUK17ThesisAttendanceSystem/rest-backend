@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const adminRoutes = require('./routes/admin');
+const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
 
 const app = express();
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/admin', adminRoutes);
+app.use('/reader', readerRoutes);
 
 app.use((error) => {
   console.log(error);

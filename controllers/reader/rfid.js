@@ -2,6 +2,12 @@ const RFID = require('../../models/rfid');
 const NewStudentRfid = require('../../models/newStudentRfid');
 const { checkStatusCode } = require('../../util/error-handler');
 
+// for checking connection
+exports.hello = (req, res, next) => {
+  console.log('Reader is sending us something :D');
+  res.status(200).json({ message: 'Hello reader form :D' });
+};
+
 // for inputing sticky RFID tags
 exports.createRFID = async (req, res, next) => {
   const { rfidTag } = req.body;
@@ -26,7 +32,7 @@ exports.createRFID = async (req, res, next) => {
 
 // for getting 1 tag at a time to create a new student
 exports.createStudentRFID = async (req, res, next) => {
-  const { rfidTag } = req.body;
+  const { rfidTag } = req.query;
 
   // find one then update it
   // if none then create one

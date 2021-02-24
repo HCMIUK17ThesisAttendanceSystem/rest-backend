@@ -5,11 +5,13 @@ const rfidController = require('../controllers/reader/rfid');
 
 const Router = express.Router();
 
+Router.get('/hello', rfidController.hello);
+
 // Manage RFID tags
 //________________________________________________________________
 // POST /reader/create-rfid
-Router.post('/create-rfid',
-  rfidController.createRFID
+Router.post('/new-rfid',
+  rfidController.createStudentRFID
 );
 //________________________________________________________________
 
