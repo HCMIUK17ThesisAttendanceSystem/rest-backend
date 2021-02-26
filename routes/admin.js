@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const isAuth = require('../util/is-auth');
+const { createError } = require('../util/error-handler');
 
 const authController = require('../controllers/admin/auth');
 const lecController = require('../controllers/admin/lecturer');
@@ -13,8 +14,6 @@ const rfidController = require('../controllers/admin/rfid');
 const Admin = require('../models/admin');
 const Lecturer = require('../models/lecturer');
 const Subject = require('../models/subject');
-const { createError } = require('../util/error-handler');
-const e = require('express');
 
 const Router = express.Router();
 
