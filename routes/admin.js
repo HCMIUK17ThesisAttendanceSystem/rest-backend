@@ -189,6 +189,8 @@ Router.get('/course/:courseId', isAuth, courseController.getCourse);
 // DELETE /admin/course/:courseId
 Router.delete('/course/:courseId', isAuth, courseController.deleteCourse);
 
+// PUT /admin/registrations
+Router.put('/registrations', isAuth, courseController.updateRegistration);
 //________________________________________________________________
 
 // Manage students

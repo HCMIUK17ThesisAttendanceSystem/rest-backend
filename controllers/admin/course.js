@@ -125,8 +125,9 @@ exports.getCourses = async (req, res, next) => {
 
     const subjects = await Subject.find(null, 'name id');
     const lecturers = await Lecturer.find(null, 'name');
+    const students = await Student.find(null, 'name id');
 
-    res.status(200).json({ courses, subjects, lecturers });
+    res.status(200).json({ courses, subjects, lecturers, students });
   } catch (error) {
     checkStatusCode(error, next);
   }
