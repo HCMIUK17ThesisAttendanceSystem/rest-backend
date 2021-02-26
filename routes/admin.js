@@ -181,7 +181,13 @@ Router.post('/course',
 );
 
 //GET /admin/courses
-Router.get('/courses', courseController.getCourses);
+Router.get('/courses', isAuth, courseController.getCourses);
+
+// GET /admin/course/:courseId
+Router.get('/course/:courseId', isAuth, courseController.getCourse);
+
+// DELETE /admin/course/:courseId
+Router.delete('/course/:courseId', isAuth, courseController.deleteCourse);
 
 //________________________________________________________________
 
@@ -189,18 +195,23 @@ Router.get('/courses', courseController.getCourses);
 //________________________________________________________________
 // POST /admin/student
 Router.post('/student',
+  isAuth,
   [
     body('name')
       .notEmpty().trim(),
     body('id')
       .matches(/^[A-Z0-9]/)
+      .isLength({ min: 11, max: 11 })
       .trim()
   ],
   studentController.createStudent
 );
 
-//GET /admin/students
+// GET /admin/students
 Router.get('/students', isAuth, studentController.getStudents);
+
+// DELETE /admin/student/:studentId
+Router.delete('/student/:studentId', isAuth, studentController.deleteStudent);
 //________________________________________________________________
 
 // Manage rfids

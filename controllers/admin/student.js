@@ -50,3 +50,21 @@ exports.getStudents = async (req, res, next) => {
     checkStatusCode(error, next);
   }
 };
+
+exports.deleteStudent = async(req, res, next) => {
+  const { studentId } = req.params;
+
+  try {
+    const student = await Student.findById(studentId);
+    if (!student)
+      throw createError('Subject not found D:', 404);
+
+    await Student.findByIdAndRemove(studentId);
+    res.status(200).json({
+      message: 'Student deleted :D',
+      studentName: student.name
+    });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+}

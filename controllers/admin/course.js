@@ -90,7 +90,7 @@ exports.updateCourse = async (req, res, next) => {
 };
 
 exports.deleteCourse = async (req, res, next) => {
-  const { courseId } = req.body;
+  const { courseId } = req.params;
 
   try {
     const course = await Course.findById(courseId);
@@ -105,14 +105,11 @@ exports.deleteCourse = async (req, res, next) => {
 };
 
 exports.getCourse = async (req, res, next) => {
-  const { courseId } = req.body;
+  const { courseId } = req.params;
 
   try {
-    const course = await Course.findById(courseId)
-      .populate('subjectId')
-      .populate('lecturerId', 'name email')
-      .populate('regStudentIds', 'name id')
-      .execPopulate();
+    const course = await Course.findById(courseId);
+
     if (!course)
       throw createError('Course not found D:', 404);
 
@@ -124,9 +121,7 @@ exports.getCourse = async (req, res, next) => {
 
 exports.getCourses = async (req, res, next) => {
   try {
-    const courses = await Course.find()
-      .populate('subjectId', 'name id')
-      .populate('lecturerId', 'name');
+    const courses = await Course.find();
 
     const subjects = await Subject.find(null, 'name id');
     const lecturers = await Lecturer.find(null, 'name');

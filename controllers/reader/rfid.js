@@ -53,6 +53,7 @@ exports.createStudentRFID = async (req, res, next) => {
       action: 'update',
       rfidTag: updateRfidTag.rfidTag
     })
+    console.log('New rfid' + updateRfidTag.rfidTag);
     res.status(200).json({ updateRfidTag });
   } catch (error) {
     checkStatusCode(error, next);
