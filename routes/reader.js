@@ -7,8 +7,8 @@ const Router = express.Router();
 
 // Manage RFID tags
 //________________________________________________________________
-// POST /reader/create-rfid
-Router.post('/create-rfid',
+// POST /reader/new-rfid
+Router.post('/new-rfid',
   rfidController.createRFID
 );
 //________________________________________________________________
