@@ -12,13 +12,13 @@ const {
 } = require('../../util/mailer');
 
 exports.createLecturer = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    throw createError('Validation failed D:', 422, errors.array());
-
-  const { email, password, name } = req.body;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw createError('Validation failed D:', 422, errors.array());
+
+    const { email, password, name } = req.body;
+
     const hashedPassword = await bcrypt.hash(password, 12);
     const lecturer = new Lecturer({
       email,
@@ -76,10 +76,10 @@ exports.getLecturers = async (req, res, next) => {
 
 exports.deleteLecturer = async (req, res, next) => {
   const { lecturerId } = req.params;
-  console.log(req.body);
+
   try {
     const lecturer = await Lecturer.findById(lecturerId);
-    
+
     if (!lecturer)
       throw createError('Lecturer not found D:', 404);
 

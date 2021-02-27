@@ -7,20 +7,20 @@ const {
 } = require('../../util/error-handler');
 
 exports.createSubject = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array()[0]);
-    throw createError(errors.array()[0].msg, 422, errors.array());
-  }
-  const { id, name, creditLab, creditTheory } = req.body;
-  const subject = new Subject({
-    id,
-    name,
-    creditLab,
-    creditTheory
-  });
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log(errors.array()[0]);
+      throw createError(errors.array()[0].msg, 422, errors.array());
+    }
+    const { id, name, creditLab, creditTheory } = req.body;
+    const subject = new Subject({
+      id,
+      name,
+      creditLab,
+      creditTheory
+    });
+
     await subject.save();
     res.status(201).json({
       message: 'Created subject :D',
@@ -61,12 +61,12 @@ exports.getSubject = async (req, res, next) => {
 };
 
 exports.updateSubject = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    throw createError('Validation failed D:', 422, errors.array());
-
-  const { subjectId, id, name, creditLab, creditTheory } = req.body;
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw createError('Validation failed D:', 422, errors.array());
+
+    const { subjectId, id, name, creditLab, creditTheory } = req.body;
     const subject = await Subject.findById(subjectId);
     if (!subject)
       throw createError('Subject not found D:', 404);
@@ -88,6 +88,7 @@ exports.updateSubject = async (req, res, next) => {
 
 exports.deleteSubject = async (req, res, next) => {
   const { subjectId } = req.params;
+  
   try {
     const subject = await Subject.findById(subjectId);
     if (!subject)
