@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const isAuth = require('../util/is-auth');
+const { createError } = require('../util/error-handler');
 
 const authController = require('../controllers/admin/auth');
 const lecController = require('../controllers/admin/lecturer');
@@ -13,8 +14,6 @@ const rfidController = require('../controllers/admin/rfid');
 const Admin = require('../models/admin');
 const Lecturer = require('../models/lecturer');
 const Subject = require('../models/subject');
-const { createError } = require('../util/error-handler');
-const e = require('express');
 
 const Router = express.Router();
 
@@ -181,26 +180,39 @@ Router.post('/course',
 );
 
 //GET /admin/courses
-Router.get('/courses', courseController.getCourses);
+Router.get('/courses', isAuth, courseController.getCourses);
 
+// GET /admin/course/:courseId
+Router.get('/course/:courseId', isAuth, courseController.getCourse);
+
+// DELETE /admin/course/:courseId
+Router.delete('/course/:courseId', isAuth, courseController.deleteCourse);
+
+// PUT /admin/registrations
+Router.put('/registrations', isAuth, courseController.updateRegistration);
 //________________________________________________________________
 
 // Manage students
 //________________________________________________________________
 // POST /admin/student
 Router.post('/student',
+  isAuth,
   [
     body('name')
       .notEmpty().trim(),
     body('id')
       .matches(/^[A-Z0-9]/)
+      .isLength({ min: 11, max: 11 })
       .trim()
   ],
   studentController.createStudent
 );
 
-//GET /admin/students
+// GET /admin/students
 Router.get('/students', isAuth, studentController.getStudents);
+
+// DELETE /admin/student/:studentId
+Router.delete('/student/:studentId', isAuth, studentController.deleteStudent);
 //________________________________________________________________
 
 // Manage rfids
