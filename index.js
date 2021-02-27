@@ -26,8 +26,8 @@ app.use((req, res, next) => {
 });
 
 app.use('/admin', adminRoutes);
-app.use('/lecturer', lecturerRoutes);
 app.use('/reader', readerRoutes);
+app.use('/lecturer', lecturerRoutes);
 
 app.use((error) => {
   console.log(error);

@@ -5,6 +5,7 @@ const isAuth = require('../util/is-auth');
 const { createError } = require('../util/error-handler');
 
 const authController = require('../controllers/lecturer/auth');
+const courseController = require('../controllers/lecturer/course');
 
 const Lecturer = require('../models/lecturer');
 
@@ -24,5 +25,12 @@ Router.post('/login',
   authController.login
 );
 //________________________________________________________________
+
+// Manage courses
+//________________________________________________________________
+// GET /lecturer/courses
+Router.get('/courses', isAuth, courseController.getCourses);
+//________________________________________________________________
+
 
 module.exports = Router;

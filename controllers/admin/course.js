@@ -205,7 +205,7 @@ exports.updateRegistration = async (req, res, next) => {
       if (!student)
         throw createError('Student not found D:', 404);
 
-      student.regCourses.push(course);
+      student.regCourseIds.push(course);
       await student.save();
     });
 
@@ -214,7 +214,7 @@ exports.updateRegistration = async (req, res, next) => {
       if (!student)
         throw createError('Student not found D:', 404);
 
-      student.regCourses.pull(course._id);
+      student.regCourseIds.pull(course._id);
       await student.save();
     });
 

@@ -72,6 +72,7 @@ Router.post('/lecturer',
     body('name').trim()
       .not().isEmpty()
   ],
+  isAuth,
   lecController.createLecturer
 );
 
@@ -81,14 +82,15 @@ Router.put('/lecturer-password',
     body('newPassword').trim()
       .isLength({ min: 5 })
   ],
+  isAuth,
   lecController.updateLecturerPassword
 );
 
 // GET /admin/lecturers
-Router.get('/lecturers', lecController.getLecturers);
+Router.get('/lecturers', isAuth, lecController.getLecturers);
 
 // DELETE /admin/lecturer
-Router.delete('/lecturer/:lecturerId', lecController.deleteLecturer);
+Router.delete('/lecturer/:lecturerId', isAuth, lecController.deleteLecturer);
 
 //________________________________________________________________
 
@@ -176,6 +178,7 @@ Router.post('/course',
         );
       })
   ],
+  isAuth,
   courseController.createCourse
 );
 
@@ -205,6 +208,7 @@ Router.post('/student',
       .isLength({ min: 11, max: 11 })
       .trim()
   ],
+  isAuth,
   studentController.createStudent
 );
 
