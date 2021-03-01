@@ -1,11 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const schedule = require('node-schedule');
 
 const adminRoutes = require('./routes/admin');
 const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
+const periodCrons = require('./util/period-cron');
 
 const app = express();
 
@@ -37,6 +39,12 @@ app.use((error) => {
   res.status(status).json({ message, data });
 });
 
+const emitCourseSchedule = periodCrons.forEach(pC => schedule.scheduleJob(pC.cron, () => {
+  console.log('running scheduled task');
+  console.log(pC.cron);
+  console.log(pC.period);
+}));
+
 mongoose.connect(
   mongooseUri,
   {
@@ -64,3 +72,4 @@ mongoose.connect(
   Add schedule to send [{ readerIP, courseID }] to desktop app via socket.io
   Desktop app sends { studentRfid, courseId, timestamp } for attendance
  */
+

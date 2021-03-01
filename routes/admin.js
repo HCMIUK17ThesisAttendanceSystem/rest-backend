@@ -10,6 +10,7 @@ const subjectController = require('../controllers/admin/subject');
 const courseController = require('../controllers/admin/course');
 const studentController = require('../controllers/admin/student');
 const rfidController = require('../controllers/admin/rfid');
+const roomController = require('../controllers/admin/room');
 
 const Admin = require('../models/admin');
 const Lecturer = require('../models/lecturer');
@@ -225,6 +226,19 @@ Router.delete('/student/:studentId', isAuth, studentController.deleteStudent);
 Router.get('/new-rfid',
   isAuth,
   rfidController.getNewStudentRfid
+);
+//________________________________________________________________
+
+// Manage rooms
+//________________________________________________________________
+// POST /admin/room
+Router.post('/room',
+  roomController.createRoom
+);
+
+// GET /admin/rooms
+Router.get('/rooms',
+  roomController.getRooms
 );
 //________________________________________________________________
 
