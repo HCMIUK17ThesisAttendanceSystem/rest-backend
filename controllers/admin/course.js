@@ -4,6 +4,7 @@ const Course = require('../../models/course');
 const Subject = require('../../models/subject');
 const Lecturer = require('../../models/lecturer');
 const Student = require('../../models/student');
+const Room = require('../../models/room');
 
 const {
   checkStatusCode,
@@ -19,12 +20,11 @@ exports.createCourse = async (req, res, next) => {
     }
 
     const {
-      classType, room, weekday,
-      periods,
-      lecturerId, subjectId
+      classType, weekday, periods,
+      roomId, lecturerId, subjectId
     } = req.body;
 
-    const existingCourses = await Course.find({ room, weekday });
+    const existingCourses = await Course.find({ roomId, weekday });
 
     const overlappingCourse = existingCourses.find(course => {
       course.periods.some(period => periods.includes(period))
@@ -33,9 +33,8 @@ exports.createCourse = async (req, res, next) => {
       throw createError('Courses are overlapping', 503, overlappingCourse);
 
     const course = new Course({
-      classType, room, weekday,
-      periods,
-      lecturerId, subjectId
+      classType, weekday, periods,
+      roomId, lecturerId, subjectId
     });
     await course.save();
 
@@ -70,8 +69,8 @@ exports.updateCourse = async (req, res, next) => {
       throw createError('Validation failed D:', 422, errors.array());
 
     const {
-      courseId,
-      classType, room, weekday,
+      courseId, roomId,
+      classType, weekday,
       periods
     } = req.body;
 
@@ -80,7 +79,7 @@ exports.updateCourse = async (req, res, next) => {
       throw createError('Course not found D:', 404);
 
     course.classType = classType;
-    course.room = room;
+    course.roomId = roomId;
     course.weekday = weekday;
     course.periods = periods;
     await course.save();
@@ -93,12 +92,23 @@ exports.deleteCourse = async (req, res, next) => {
   const { courseId } = req.params;
 
   try {
-    const course = await Course.findById(courseId);
+    const course = await Course.findByIdAndDelete(courseId);
     if (!course)
       throw createError('Course not found D:', 404);
+    
+    const lecturer = Lecturer.findById(course.lecturerId)
+    if (!lecturer)
+      throw createError('Lecturer not found D:', 404);
+    lecturer.courseIds.pull(courseId);
+    await lecturer.save();
 
-    await Course.findByIdAndRemove(courseId);
-    res.status(200).json({ message: 'Deleted course :D' });
+    const subject = await Subject.findById(course.subjectId);
+    if (!subject)
+      throw createError('Subject not found D:', 404);
+    subject.courseIds.pull(courseId);
+    await subject.save();
+
+    res.status(200).json({ message: 'Deleted course & relations :D' });
   } catch (error) {
     checkStatusCode(error, next);
   }
@@ -122,12 +132,12 @@ exports.getCourse = async (req, res, next) => {
 exports.getCourses = async (req, res, next) => {
   try {
     const courses = await Course.find();
-
     const subjects = await Subject.find(null, 'name id');
     const lecturers = await Lecturer.find(null, 'name');
     const students = await Student.find(null, 'name id');
+    const rooms = await Room.find(null, 'code');
 
-    res.status(200).json({ courses, subjects, lecturers, students });
+    res.status(200).json({ courses, subjects, lecturers, students, rooms });
   } catch (error) {
     checkStatusCode(error, next);
   }

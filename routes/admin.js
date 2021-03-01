@@ -136,10 +136,10 @@ Router.post('/course',
   [
     body('classType')
       .isInt({ min: 0, max: 1 }),
-    body('room')
-      .trim()
-      .isLength({ min: 4, max: 6 })
-      .matches(/^[A-Z0-9 .]/),
+    // body('room')
+    //   .trim()
+    //   .isLength({ min: 4, max: 6 })
+    //   .matches(/^[A-Z0-9 .]/),
     body('weekday')
       .isInt({ min: 0, max: 6 }),
     body('periods')
@@ -233,12 +233,32 @@ Router.get('/new-rfid',
 //________________________________________________________________
 // POST /admin/room
 Router.post('/room',
+  isAuth,
   roomController.createRoom
 );
 
 // GET /admin/rooms
 Router.get('/rooms',
+  isAuth,
   roomController.getRooms
+);
+
+// GET /admin/room/:roomId
+Router.get('/room/:roomId', 
+  isAuth, 
+  roomController.getRoom
+);
+
+// PUT /admin/room
+Router.put('/room',
+  isAuth,
+  roomController.updateRoom
+);
+
+// DELETE /admin/room/:roomId
+Router.delete('/room/:roomId',
+  isAuth,
+  roomController.deleteRoom
 );
 //________________________________________________________________
 

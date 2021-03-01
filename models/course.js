@@ -6,10 +6,6 @@ const courseSchema = new Schema({
     type: String,
     required: true
   },
-  room: {
-    type: String,
-    required: true
-  },
   weekday: {
     type: String,
     required: true
@@ -18,6 +14,11 @@ const courseSchema = new Schema({
     type: Number,
     required: true
   }],
+  roomId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Room',
+    required: true
+  },
   lecturerId: {
     type: Schema.Types.ObjectId,
     ref: 'Lecturer',

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const attendanceRecordSchema = new Schema({
+const attendanceSchema = new Schema({
   studentId: {
     type: Schema.Types.ObjectId,
     ref: 'Student',
@@ -14,4 +14,4 @@ const attendanceRecordSchema = new Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('AttendanceRecord', attendanceRecordSchema);
+module.exports = mongoose.model('Attendance', attendanceSchema);

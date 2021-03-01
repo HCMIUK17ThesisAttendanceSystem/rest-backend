@@ -55,3 +55,62 @@ exports.getRooms = async (req, res, next) => {
     checkStatusCode(error, next);
   }
 };
+
+exports.getRoom = async (req, res, next) => {
+  const { roomId } = req.params;
+
+  try {
+    const room = await Room.findById(roomId);
+    if (!room)
+      throw createError('Room not found D:', 404);
+
+    res.status(200).json({
+      message: 'Room fetched :D',
+      room
+    });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+exports.updateRoom = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw createError('Validation failed D:', 422, errors.array());
+
+    const { roomId, code, readerIp } = req.body;
+    const room = await Room.findById(roomId);
+    if (!room)
+      throw createError('room not found D:', 404);
+
+    room.code = code;
+    room.readerIp = readerIp;
+    await room.save();
+
+    res.status(200).json({
+      message: 'Room updated :D',
+      room
+    })
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
+exports.deleteRoom = async (req, res, next) => {
+  const { roomId } = req.params;
+  
+  try {
+    const room = await Room.findById(roomId);
+    if (!room)
+      throw createError('room not found D:', 404);
+
+    await Room.findByIdAndRemove(roomId);
+    res.status(200).json({
+      message: 'Room deleted :D',
+      roomName: room.name
+    });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};

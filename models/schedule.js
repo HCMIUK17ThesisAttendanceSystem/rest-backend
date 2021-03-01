@@ -1,3 +1,0 @@
-exports.emitCurrentCourses = async (period) => {
-
-};
