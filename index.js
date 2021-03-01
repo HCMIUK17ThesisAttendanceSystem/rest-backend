@@ -55,3 +55,12 @@ mongoose.connect(
   })
   .catch(err => console.log(err));
 
+// TODO
+/*
+  Create model of Room with reader IP and room code
+  Create static [{ periodNum, periodTime(10p early) }]
+  Create function to make [{ readerIP, courseID }] in a period
+  npm i node-schedule
+  Add schedule to send [{ readerIP, courseID }] to desktop app via socket.io
+  Desktop app sends { studentRfid, courseId, timestamp } for attendance
+ */
