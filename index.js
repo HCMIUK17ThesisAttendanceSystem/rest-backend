@@ -8,6 +8,7 @@ const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
 const periodCrons = require('./util/period-cron');
+const socket = require('./util/socket');
 
 const app = express();
 
@@ -58,17 +59,26 @@ mongoose.connect(
     const server = app.listen(8080);
     const io = require('./util/socket').init(server);
     io.on('connection', socket => {
-      console.log('client connected to socket.io');
+      console.log(`Client ${socket.client.id} connected to socket.io`);
+      // io.emit('current-courses', {
+      //   action: 'update',
+      //   data: ["These are courses :D", "This is another course :D"]
+      // });
+    });
+    io.on('get-current-courses', socket => {
+      console.log('Reader app requires courses :D');
+      // check password
+      // emit courses
+      io.emit('current-courses', {
+        action: 'update',
+        data: "These are courses :D"
+      });
     });
   })
   .catch(err => console.log(err));
 
 // TODO
 /*
-  Create model of Room with reader IP and room code
-  Create static [{ periodNum, periodTime(10p early) }]
-  Create function to make [{ readerIP, courseID }] in a period
-  npm i node-schedule
   Add schedule to send [{ readerIP, courseID }] to desktop app via socket.io
   Desktop app sends { studentRfid, courseId, timestamp } for attendance
  */
