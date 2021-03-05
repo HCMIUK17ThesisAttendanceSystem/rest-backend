@@ -9,7 +9,7 @@ const {
 const io = require('../../util/socket');
 
 exports.checkAttendance = async (req, res, next) => {
-  const { courseId, rfidTag } = req.body;
+  const { courseId, rfidTag } = req.query;
 
   try {
     const course = await Course.findById(courseId);
@@ -29,6 +29,7 @@ exports.checkAttendance = async (req, res, next) => {
       await attendance.save();
     } else {
       // to different model
+      console.log("Student does not registered for this course :D");
     }
 
     io.getIO().emit('attendance', {
@@ -43,6 +44,6 @@ exports.checkAttendance = async (req, res, next) => {
       student: student.name
     })
   } catch (error) {
-    
+    checkStatusCode(error, next);
   }
 };
