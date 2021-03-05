@@ -12,6 +12,9 @@ const rfidSchema = new Schema({
     type: String,
     required: true,
     unique: true
+  },
+  isLinked: {
+    type: Boolean,
   }
 });
 

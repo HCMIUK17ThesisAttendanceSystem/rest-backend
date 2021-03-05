@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 
 const Student = require('../../models/student');
 const NewStudentRFID = require('../../models/newStudentRfid');
+const RFID = require('../../models/rfid');
 
 const {
   checkStatusCode,
@@ -29,7 +30,11 @@ exports.createStudent = async (req, res, next) => {
       name, id, rfidTag
     });
     await student.save();
-    await NewStudentRFID.findOneAndRemove();
+    // await NewStudentRFID.findOneAndRemove();
+    const rfid = await RFID.findOne({ rfidTag });
+    rfid.isLinked = true;
+    await rfid.save();
+
     res.status(201).json({
       message: 'Created student :D',
       student
@@ -45,13 +50,14 @@ exports.getStudents = async (req, res, next) => {
     if (!students)
       throw createError('Students not found D:', 404);
     const newRFID = await NewStudentRFID.findOne();
-    res.status(200).json({ students, newRFID });
+    const RFIDs = await RFID.find({ isLinked: { $ne: true } });
+    res.status(200).json({ students, newRFID, RFIDs });
   } catch (error) {
     checkStatusCode(error, next);
   }
 };
 
-exports.deleteStudent = async(req, res, next) => {
+exports.deleteStudent = async (req, res, next) => {
   const { studentId } = req.params;
 
   try {
@@ -59,7 +65,12 @@ exports.deleteStudent = async(req, res, next) => {
     if (!student)
       throw createError('Subject not found D:', 404);
 
+    const rfid = await RFID.findOne({ rfidTag: student.rfidTag });
+    rfid.isLinked = false;
+    await rfid.save();
+
     await Student.findByIdAndRemove(studentId);
+
     res.status(200).json({
       message: 'Student deleted :D',
       studentName: student.name

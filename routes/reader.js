@@ -11,9 +11,10 @@ Router.get('/hello', rfidController.hello);
 // Manage RFID tags
 //________________________________________________________________
 // POST /reader/new-rfid
-Router.post('/new-rfid',
-  rfidController.createStudentRFID
-);
+Router.post('/new-rfid', rfidController.createStudentRFID);
+
+// POST /reader/rfid
+Router.post('/rfid', rfidController.createRFID);
 //________________________________________________________________
 
 // Manage attendance records
