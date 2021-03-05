@@ -1,16 +1,33 @@
+const path = require('path');
+const fs = require('fs');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const schedule = require('node-schedule');
+const helmet = require('helmet'); // protection from common attack
+const compression = require('compression'); // compress sent data to reduce workload
+const morgan = require('morgan'); // logging
+// const csrf = require('csurf');
 
 const adminRoutes = require('./routes/admin');
 const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
 const periodCrons = require('./util/period-cron');
-const socket = require('./util/socket');
 
 const app = express();
+
+// const csrfProtection = csrf();
+
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, 'access.log'),
+  { flags: 'a' }
+);
+
+app.use(helmet());
+app.use(compression());
+app.use(morgan('combined', { stream: accessLogStream }));
 
 // app.use(bodyParser.urlencoded()) // x-www-form-urlencoded <form>
 app.use(bodyParser.json()) // application/json
@@ -27,6 +44,12 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+// app.use(csrfProtection);
+// app.use((req, res, next) => {
+//   res.locals.csrfToken = req.csrfToken();
+//   next();
+// });
 
 app.use('/admin', adminRoutes);
 app.use('/reader', readerRoutes);
@@ -45,7 +68,6 @@ app.use((error) => {
   res.status(status).json({ message, data });
 });
 
-
 mongoose.connect(
   mongooseUri,
   {
@@ -56,7 +78,7 @@ mongoose.connect(
   }
 )
   .then(result => {
-    const server = app.listen(8080);
+    const server = app.listen(process.env.PORT || 8080);
     const io = require('./util/socket').init(server);
     io.on('connection', socket => {
       console.log(`Client ${socket.client.id} connected to socket.io`);
@@ -81,5 +103,6 @@ mongoose.connect(
 /*
   Add schedule to send [{ readerIP, courseID }] to desktop app via socket.io
   Desktop app sends { studentRfid, courseId, timestamp } for attendance
+  Add csrf, ssl protection
  */
 
