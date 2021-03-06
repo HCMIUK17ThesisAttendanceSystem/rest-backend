@@ -105,4 +105,5 @@ dist
 
 # Manual ignore
 # util/mailer.js
-# nodemon.json
+./nodemon.json
+nodemon.json

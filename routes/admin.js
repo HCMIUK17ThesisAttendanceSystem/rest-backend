@@ -136,10 +136,6 @@ Router.post('/course',
   [
     body('classType')
       .isInt({ min: 0, max: 1 }),
-    // body('room')
-    //   .trim()
-    //   .isLength({ min: 4, max: 6 })
-    //   .matches(/^[A-Z0-9 .]/),
     body('weekday')
       .isInt({ min: 0, max: 6 }),
     body('periods')
@@ -155,17 +151,6 @@ Router.post('/course',
           throw createError('Invalid periods\' data', 502);
         return true;
       }), // valid periods: [1,2,3]...
-    // body('periodStart')
-    //   .isInt({ min: 1, max: 15 }),
-    // body('periodEnd')
-    //   .isInt({ min: 2, max: 16 })
-    //   .custom((value, { req }) => {
-    //     if (value < req.body.periodStart) {
-    //       throw new Error('Start period larger than end period D:');
-    //     } else {
-    //       return value;
-    //     }
-    //   }),
     body('subjectId')
       .custom((value, { req }) => {
         return Subject.findById(value).then(subjectDoc =>
