@@ -1,7 +1,7 @@
 {
   "env": {
-    "MONGO_USER": "cqhung1412",
-    "MONGO_PASSWORD": "V4LFIyV7ivj4No49",
+    "MONGO_USER": "presenceadmin",
+    "MONGO_PASSWORD": "LngHuQ65tJbnu3oU",
     "MONGO_CLUSTER": "presence-cluster0.hhz9u",
     "MONGO_DATABASE": "attendance"
   }

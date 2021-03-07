@@ -104,5 +104,3 @@ dist
 .tern-port
 
 # Manual ignore
-# util/mailer.js
-# nodemon.json
