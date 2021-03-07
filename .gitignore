@@ -107,3 +107,4 @@ dist
 # util/mailer.js
 ./nodemon.json
 nodemon.json
+nodemon.json
