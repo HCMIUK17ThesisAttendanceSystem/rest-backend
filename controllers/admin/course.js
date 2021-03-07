@@ -25,12 +25,11 @@ exports.createCourse = async (req, res, next) => {
     } = req.body;
 
     const existingCourses = await Course.find({ roomId, weekday });
-
-    const overlappingCourse = existingCourses.find(course => {
+    const overlappingCourses = existingCourses.find(course =>
       course.periods.some(period => periods.includes(period))
-    })
-    if (overlappingCourse)
-      throw createError('Courses are overlapping', 503, overlappingCourse);
+    );
+    if (overlappingCourses)
+      throw createError('Courses are overlapping', 503, overlappingCourses);
 
     const course = new Course({
       classType, weekday, periods,
@@ -92,21 +91,31 @@ exports.deleteCourse = async (req, res, next) => {
   const { courseId } = req.params;
 
   try {
-    const course = await Course.findByIdAndDelete(courseId);
+    const course = await Course.findById(courseId);
     if (!course)
       throw createError('Course not found D:', 404);
-    
-    const lecturer = Lecturer.findById(course.lecturerId)
-    if (!lecturer)
-      throw createError('Lecturer not found D:', 404);
-    lecturer.courseIds.pull(courseId);
-    await lecturer.save();
+
+    const lecturer = await Lecturer.findById(course.lecturerId);
+    if (lecturer) {
+      lecturer.courseIds.pull(courseId);
+      await lecturer.save();
+    }
 
     const subject = await Subject.findById(course.subjectId);
-    if (!subject)
-      throw createError('Subject not found D:', 404);
-    subject.courseIds.pull(courseId);
-    await subject.save();
+    if (subject) {
+      subject.courseIds.pull(courseId);
+      await subject.save();
+    }
+
+    course.regStudentIds.forEach(async (id) => {
+      const student = await Student.findById(id);
+      if (student) {
+        student.regCourseIds.pull(courseId);
+        await student.save();
+      }
+    });
+
+    await Course.findByIdAndRemove(courseId);
 
     res.status(200).json({ message: 'Deleted course & relations :D' });
   } catch (error) {
@@ -197,17 +206,19 @@ exports.updateRegistration = async (req, res, next) => {
     const { regStudentIds, courseId } = req.body;
 
     const course = await Course.findById(courseId);
-    //.populate('regStudentIds');
+    if (!course)
+      throw createError('Course not found D:', 404);
 
+    const courseRegStudentIds = course.regStudentIds.map(id => id.toString());
     // Find 3 types of students
     // 1. Newly registered (in regIds, not in courseRegIds)
     const newStudentIds = regStudentIds
-      .filter(id => !course.regStudentIds.includes(id));
+      .filter(id => !courseRegStudentIds.includes(id));
     // 2. Old registered (in regIds, in courseRegIds)
     const oldRegStudentIds = regStudentIds
-      .filter(id => course.regStudentIds.includes(id));
+      .filter(id => courseRegStudentIds.includes(id));
     // 3. Drop course (not in regIds, in courseRegIds)
-    const dropStudentIds = course.regStudentIds
+    const dropStudentIds = courseRegStudentIds
       .filter(id => !regStudentIds.includes(id));
 
     newStudentIds.forEach(async (id) => {

@@ -11,12 +11,15 @@ exports.hello = (req, res, next) => {
 
 // for inputing sticky RFID tags
 exports.createRFID = async (req, res, next) => {
-  const { rfidTag } = req.body;
+  const { rfidTag } = req.query;
 
   try {
-    const existingRfidTag = await RFID.find({ rfidTag });
+    const existingRfidTag = await RFID.findOne({ rfidTag });
     if (existingRfidTag) {
-      res.status(500).json({ message: 'Existing tag D:' })
+      res.status(500).json({ 
+        message: 'Existing tag D:', 
+        id: existingRfidTag.id 
+      });
     } else {
       const rfidCount = await RFID.find().countDocuments();
       const rfid = new RFID({
@@ -24,7 +27,7 @@ exports.createRFID = async (req, res, next) => {
         rfidTag
       });
       await rfid.save();
-      res.status(201).json({ rfid });
+      res.status(201).json({ num: rfid.id });
     }
   } catch (error) {
     checkStatusCode(error, next);
