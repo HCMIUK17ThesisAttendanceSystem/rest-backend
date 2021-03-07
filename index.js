@@ -60,7 +60,7 @@ const emitCourseSchedule = periodCrons.forEach(pC => schedule.scheduleJob(
   () => require('./util/schedule').emitScheduledCourses(pC.period)
 ));
 
-app.use((req, res, next, error) => {
+app.use((error) => {
   console.log(error);
   const status = error.statusCode || 500;
   const message = error.message;
