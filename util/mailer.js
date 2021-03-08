@@ -9,8 +9,8 @@ exports.createLecturerEmail = async (toEmail, password, name) => {
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    port: 465,
+    secure: true, // true for 465, false for other ports
     auth: {
       user: "wokhug99@gmail.com", // generated ethereal user
       pass: "Thihanh76@", // generated ethereal password
