@@ -2,18 +2,18 @@ const nodemailer = require('nodemailer');
 
 // async..await is not allowed in global scope, must use a wrapper
 exports.createLecturerEmail = async (toEmail, password, name) => {
-  // Generate test SMTP service account from ethereal.email
-  // Only needed if you don't have a real mail account for testing
-  let testAccount = await nodemailer.createTestAccount();
+  // // Generate test SMTP service account from ethereal.email
+  // // Only needed if you don't have a real mail account for testing
+  // let testAccount = await nodemailer.createTestAccount();
 
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
+    host: "smtp.gmail.com",
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
+      user: "wokhug99@gmail.com", // generated ethereal user
+      pass: "Thihanh76@", // generated ethereal password
     },
   });
 

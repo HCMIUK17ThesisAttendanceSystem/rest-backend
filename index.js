@@ -82,10 +82,10 @@ mongoose.connect(
     const io = require('./util/socket').init(server);
     io.on('connection', socket => {
       console.log(`Client ${socket.client.id} connected to socket.io`);
-      // io.emit('current-courses', {
-      //   action: 'update',
-      //   data: ["These are courses :D", "This is another course :D"]
-      // });
+      io.emit('current-courses', {
+        action: 'update',
+        data: ["These are courses :D", "This is another course :D"]
+      });
     });
     io.on('get-current-courses', socket => {
       console.log('Reader app requires courses :D');
