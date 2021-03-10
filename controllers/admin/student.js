@@ -9,7 +9,6 @@ const {
   checkStatusCode,
   createError
 } = require('../../util/error-handler');
-const { findById } = require('../../models/course');
 
 exports.createStudent = async (req, res, next) => {
   try {
@@ -18,7 +17,7 @@ exports.createStudent = async (req, res, next) => {
       throw createError('Validation failed D:', 422, errors.array());
 
     const {
-      name, id, rfidTag, note
+      name, id, rfidTag
     } = req.body;
 
     const sameIdStudent = await Student.findOne({ id: id });
@@ -29,7 +28,7 @@ exports.createStudent = async (req, res, next) => {
       throw createError('Replicated RFID Tag D:', 500);
 
     const student = new Student({
-      name, id, rfidTag, note: note && note
+      name, id, rfidTag
     });
     await student.save();
     // await NewStudentRFID.findOneAndRemove();
@@ -46,21 +45,56 @@ exports.createStudent = async (req, res, next) => {
   }
 };
 
+exports.updateStudentRFIDTag = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw createError('Validation failed D:', 422, errors.array());
+
+    const { studentId } = req.params;
+    const { rfidTag } = req.body;
+
+    const updatingStudent = await Student.findById(studentId);
+    if (!updatingStudent)
+      throw createError('Student not found D:', 404);
+
+    const oldRfid = await RFID.findOne({ rfidTag: updatingStudent.rfidTag });
+    oldRfid.isLinked = false;
+    await oldRfid.save();
+
+    updatingStudent.rfidTag = rfidTag;
+    await student.save();
+
+    const newRfid = await RFID.findOne({ rfidTag });
+    newRfid.isLinked = true;
+    await newRfid.save();
+
+    res.status(201).json({
+      message: 'Created student :D',
+      student,
+      newRFID: newRfid.id,
+      oldRFID: oldRfid.id
+    });
+  } catch (error) {
+    checkStatusCode(error, next);
+  }
+};
+
 exports.getStudents = async (req, res, next) => {
   try {
     const students = await Student.find();
     if (!students)
       throw createError('Students not found D:', 404);
-    const newRFID = await NewStudentRFID.findOne();
+
     const RFIDs = await RFID.find({ isLinked: { $ne: true } });
-    res.status(200).json({ students, newRFID, RFIDs });
+    res.status(200).json({ students, RFIDs });
   } catch (error) {
     checkStatusCode(error, next);
   }
 };
 
 exports.getStudent = async (req, res, next) => {
-  const { studentId } = req.body;
+  const { studentId } = req.params;
   try {
     const student = await Student.findById(studentId);
     if (!student)
@@ -83,7 +117,7 @@ exports.deleteStudent = async (req, res, next) => {
     const rfid = await RFID.findOne({ rfidTag: student.rfidTag });
     rfid.isLinked = false;
     await rfid.save();
-    
+
     student.regCourseIds.forEach(async (id) => {
       const course = await Course.findById(id);
       if (course) {

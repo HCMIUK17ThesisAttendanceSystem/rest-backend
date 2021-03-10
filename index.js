@@ -82,6 +82,9 @@ mongoose.connect(
     const io = require('./util/socket').init(server);
     io.on('connection', socket => {
       console.log(`Client ${socket.client.id} connected to socket.io`);
+      io.on('disconnect', reason => {
+        console.log(reason);
+      })
       io.emit('current-courses', {
         action: 'update',
         data: ["These are courses :D", "This is another course :D"]
