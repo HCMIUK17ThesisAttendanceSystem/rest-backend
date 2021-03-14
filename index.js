@@ -9,6 +9,7 @@ const helmet = require('helmet'); // protection from common attack
 const compression = require('compression'); // compress sent data to reduce workload
 const morgan = require('morgan'); // logging
 // const csrf = require('csurf');
+const moment = require('moment')();
 
 const adminRoutes = require('./routes/admin');
 const lecturerRoutes = require('./routes/lecturer');
@@ -67,6 +68,11 @@ app.use((req, res, next, error) => {
   const data = error.data;
   res.status(status).json({ message, data });
 });
+
+const weekday = moment.get('weekday');
+const hour = moment.get('hour');
+const min = moment.get('minute')
+console.log(weekday, hour, min);
 
 mongoose.connect(
   mongooseUri,
