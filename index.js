@@ -9,12 +9,16 @@ const helmet = require('helmet'); // protection from common attack
 const compression = require('compression'); // compress sent data to reduce workload
 const morgan = require('morgan'); // logging
 // const csrf = require('csurf');
+const { AwakeHeroku } = require("awake-heroku");
 
 const adminRoutes = require('./routes/admin');
 const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
-const periodCrons = require('./util/period-cron');
+const { periods } = require('./util/periods');
+
+AwakeHeroku.add("https://hcmiu-presence.herokuapp.com");
+AwakeHeroku.start();
 
 const app = express();
 
@@ -55,9 +59,9 @@ app.use('/admin', adminRoutes);
 app.use('/reader', readerRoutes);
 app.use('/lecturer', lecturerRoutes);
 
-const emitCourseSchedule = periodCrons.forEach(pC => schedule.scheduleJob(
-  pC.cron,
-  () => require('./util/schedule').emitScheduledCourses(pC.period)
+const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
+  period.cron,
+  () => require('./util/schedule').emitScheduledCourses(period.number)
 ));
 
 app.use((req, res, next, error) => {
