@@ -89,10 +89,6 @@ mongoose.connect(
       io.on('disconnect', reason => {
         console.log(reason);
       });
-      io.emit('current-courses', {
-        action: 'update',
-        data: ["These are courses :D", "This is another course :D"]
-      });
     });
     io.on('get-current-courses', socket => {
       console.log('Reader app requires courses :D');
