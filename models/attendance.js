@@ -11,7 +11,11 @@ const attendanceSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Course',
     required: true
-  }
+  },
+  checkTimes: [{
+    type: Date,
+    default: Date.now()
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

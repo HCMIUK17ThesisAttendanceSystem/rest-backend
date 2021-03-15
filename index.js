@@ -15,10 +15,7 @@ const adminRoutes = require('./routes/admin');
 const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
-const { 
-  periods,
-  getCurrentPeriod
-} = require('./util/periods');
+const { periods } = require('./util/periods');
 
 AwakeHeroku.add("https://hcmiu-presence.herokuapp.com");
 AwakeHeroku.start();
@@ -89,10 +86,9 @@ mongoose.connect(
     const io = require('./util/socket').init(server);
     io.on('connection', socket => {
       console.log(`Client ${socket.client.id} connected to socket.io`);
-      // io.emit('current-courses', {
-      //   action: 'update',
-      //   data: ["These are courses :D", "This is another course :D"]
-      // });
+      io.on('disconnect', reason => {
+        console.log(reason);
+      });
     });
     io.on('get-current-courses', socket => {
       console.log('Reader app requires courses :D');
