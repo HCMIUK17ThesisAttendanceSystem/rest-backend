@@ -21,8 +21,8 @@ exports.periods = [
   createPeriod(3, '1 40 9 * * *', 9, 40, 10, 30),
   createPeriod(4, '1 30 10 * * *', 10, 30, 11, 25),
   createPeriod(5, '1 25 11 * * *', 11, 25, 12, 15),
-  createPeriod(6, '1 15 12 * * *', 12, 15, 13, 10),
-  createPeriod(7, '1 11 13 * * *', 13, 11, 14, 5),
+  createPeriod(6, '1 15 12 * * *', 12, 15, 13, 5),
+  createPeriod(7, '1 11 13 * * *', 13, 6, 14, 5),
   createPeriod(8, '1 5 14 * * *', 14, 5, 14, 55),
   createPeriod(9, '1 55 14 * * *', 14, 55, 15, 45),
   createPeriod(10, '1 46 15 * * *', 15, 46, 16, 40),
@@ -32,7 +32,6 @@ exports.periods = [
 
 exports.getCurrentPeriod = () => {
   const currentTime = moment();
-  console.log(currentTime);
   const currentPeriod = this.periods.find(period => {
     const start = moment().set({
       'hour': period.startTime.hour,
@@ -48,5 +47,5 @@ exports.getCurrentPeriod = () => {
     const isBeforeEnd = currentTime.isBefore(end);
     return isAfterStart && isBeforeEnd;
   });
-  console.log(currentPeriod);
+  return currentPeriod ? currentPeriod.number : null;
 };

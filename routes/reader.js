@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 
 const rfidController = require('../controllers/reader/rfid');
 const attendanceController = require('../controllers/reader/attendance');
+const courseController = require('../controllers/reader/course');
 
 const Router = express.Router();
 
@@ -22,4 +23,11 @@ Router.post('/rfid', rfidController.createRFID);
 // POST reader/attendance
 Router.post('/attendance', attendanceController.checkAttendance);
 //________________________________________________________________
+
+// Manage course
+//________________________________________________________________
+// GET reader/current-course/:roomCode
+Router.get('/current-course/:roomCode', courseController.getCurrentCourse);
+//________________________________________________________________
+
 module.exports = Router;
