@@ -51,7 +51,6 @@ exports.checkAttendance = async (req, res, next) => {
         message: studentInCourse ?
           'Check attendance successfully :D' :
           'Student does not registered for this course :D',
-        course: course._id,
         student: student.name
       });
     } else {
