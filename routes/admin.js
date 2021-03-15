@@ -201,6 +201,12 @@ Router.post('/student',
 // GET /admin/students
 Router.get('/students', isAuth, studentController.getStudents);
 
+// GET /admin/student/:studentId
+Router.get('/student/:studentId', isAuth, studentController.getStudent);
+
+// PUT /admin/student-rfid/:studentId
+Router.put('/student-rfid/:studentId', isAuth, studentController.updateStudentRFIDTag);
+
 // DELETE /admin/student/:studentId
 Router.delete('/student/:studentId', isAuth, studentController.deleteStudent);
 //________________________________________________________________
