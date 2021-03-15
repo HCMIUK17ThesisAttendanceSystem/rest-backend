@@ -9,6 +9,7 @@ const helmet = require('helmet'); // protection from common attack
 const compression = require('compression'); // compress sent data to reduce workload
 const morgan = require('morgan'); // logging
 // const csrf = require('csurf');
+const moment = require('moment');
 const { AwakeHeroku } = require("awake-heroku");
 
 const adminRoutes = require('./routes/admin');
@@ -71,6 +72,8 @@ app.use((req, res, next, error) => {
   const data = error.data;
   res.status(status).json({ message, data });
 });
+
+getCurrentPeriod();
 
 mongoose.connect(
   mongooseUri,

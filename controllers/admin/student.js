@@ -9,6 +9,7 @@ const {
   checkStatusCode,
   createError
 } = require('../../util/error-handler');
+const { findById } = require('../../models/course');
 
 exports.createStudent = async (req, res, next) => {
   try {
@@ -17,7 +18,7 @@ exports.createStudent = async (req, res, next) => {
       throw createError('Validation failed D:', 422, errors.array());
 
     const {
-      name, id, rfidTag
+      name, id, rfidTag, note
     } = req.body;
 
     const sameIdStudent = await Student.findOne({ id: id });
@@ -28,7 +29,7 @@ exports.createStudent = async (req, res, next) => {
       throw createError('Replicated RFID Tag D:', 500);
 
     const student = new Student({
-      name, id, rfidTag
+      name, id, rfidTag, note: note && note
     });
     await student.save();
     // await NewStudentRFID.findOneAndRemove();
@@ -95,6 +96,7 @@ exports.getStudents = async (req, res, next) => {
 
 exports.getStudent = async (req, res, next) => {
   const { studentId } = req.params;
+
   try {
     const student = await Student.findById(studentId);
     if (!student)
