@@ -21,7 +21,6 @@ exports.emitScheduledCourses = async (period) => {
     };
     result.push(obj);
   });
-  console.log(result);
   io.getIO().emit('scheduled-courses', {
     action: 'update',
     data: result
