@@ -59,11 +59,6 @@ app.use('/admin', adminRoutes);
 app.use('/reader', readerRoutes);
 app.use('/lecturer', lecturerRoutes);
 
-const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
-  period.cron,
-  () => require('./util/schedule').emitScheduledCourses(period.number)
-));
-
 app.use((req, res, next, error) => {
   console.log(error);
   const status = error.statusCode || 500;
@@ -71,6 +66,11 @@ app.use((req, res, next, error) => {
   const data = error.data;
   res.status(status).json({ message, data });
 });
+
+const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
+  period.cron,
+  () => require('./util/schedule').emitScheduledCourses(period.number)
+));
 
 mongoose.connect(
   mongooseUri,

@@ -19,7 +19,8 @@ exports.getCurrentCourse = async (req, res, next) => {
         res.status(200).json({
           _id: currentCourse._id,
           SubjectName: currentCourse.subjectId.name,
-          SubjectId: currentCourse.subjectId.id
+          SubjectId: currentCourse.subjectId.id,
+          RoomCode: roomCode
         });
       else res.status(404).json({
         message: `No course for ${roomCode} now :D`
