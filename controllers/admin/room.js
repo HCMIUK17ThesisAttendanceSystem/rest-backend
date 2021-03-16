@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator');
 const Room = require('../../models/room');
 
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 
@@ -37,7 +37,7 @@ exports.createRoom = async (req, res, next) => {
       readerIp: newRoom.readerIp
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -52,7 +52,7 @@ exports.getRooms = async (req, res, next) => {
       rooms
     })
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -69,7 +69,7 @@ exports.getRoom = async (req, res, next) => {
       room
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -93,7 +93,7 @@ exports.updateRoom = async (req, res, next) => {
       room
     })
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -111,6 +111,6 @@ exports.deleteRoom = async (req, res, next) => {
       roomName: room.name
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };

@@ -59,12 +59,14 @@ app.use('/admin', adminRoutes);
 app.use('/reader', readerRoutes);
 app.use('/lecturer', lecturerRoutes);
 
-app.use((req, res, next, error) => {
-  console.log(error);
-  const status = error.statusCode || 500;
-  const message = error.message;
-  const data = error.data;
-  res.status(status).json({ message, data });
+app.use((req, res) => {
+  const { error } = req;
+  if (error) {
+    const status = error.statusCode || 500;
+    const message = error.message;
+    const data = error.data;
+    res.status(status).json({ message, data });
+  }
 });
 
 const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(

@@ -201,11 +201,11 @@ Router.post('/student',
 // GET /admin/students
 Router.get('/students', isAuth, studentController.getStudents);
 
-// GET /admin/student/:studentId
+// GET /admin/student
 Router.get('/student/:studentId', isAuth, studentController.getStudent);
 
-// PUT /admin/student-rfid/:studentId
-Router.put('/student-rfid/:studentId', isAuth, studentController.updateStudentRFIDTag);
+// PUT /admin/student-rfid
+Router.put('/student-rfid', studentController.updateStudentRFIDTag);
 
 // DELETE /admin/student/:studentId
 Router.delete('/student/:studentId', isAuth, studentController.deleteStudent);

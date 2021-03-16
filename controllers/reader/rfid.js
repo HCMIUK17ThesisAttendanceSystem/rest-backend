@@ -1,6 +1,6 @@
 const RFID = require('../../models/rfid');
 const NewStudentRfid = require('../../models/newStudentRfid');
-const { checkStatusCode } = require('../../util/error-handler');
+const { errorHandler } = require('../../util/error-handler');
 const io = require('../../util/socket');
 
 // for checking connection
@@ -30,7 +30,7 @@ exports.createRFID = async (req, res, next) => {
       res.status(201).json({ num: rfid.id });
     }
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -59,7 +59,7 @@ exports.createStudentRFID = async (req, res, next) => {
     console.log('New rfid' + updateRfidTag.rfidTag);
     res.status(200).json({ updateRfidTag });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 

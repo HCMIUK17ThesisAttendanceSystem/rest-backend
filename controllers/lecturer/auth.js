@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const Lecturer = require('../../models/lecturer');
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 
@@ -36,7 +36,7 @@ exports.login = async (req, res, next) => {
       userId: lecturer._id.toString()
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   };
 };
 
@@ -65,6 +65,6 @@ exports.changePassword = async (req, res, next) => {
       userId: lecturer._id.toString()
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   };
 };

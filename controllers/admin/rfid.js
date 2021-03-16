@@ -1,7 +1,7 @@
 const NewStudentRFID = require('../../models/newStudentRfid');
 
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 
@@ -12,6 +12,6 @@ exports.getNewStudentRfid = (req, res, next) => {
      throw createError('New RFID not scanned D:', 404);
     res.status(200).json({ rfidTag: newRfid.rfidTag });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };

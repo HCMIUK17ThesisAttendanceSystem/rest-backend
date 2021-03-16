@@ -7,7 +7,7 @@ const Student = require('../../models/student');
 const Room = require('../../models/room');
 
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 
@@ -56,7 +56,7 @@ exports.createCourse = async (req, res, next) => {
       lecturer
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -83,7 +83,7 @@ exports.updateCourse = async (req, res, next) => {
     course.periods = periods;
     await course.save();
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -119,7 +119,7 @@ exports.deleteCourse = async (req, res, next) => {
 
     res.status(200).json({ message: 'Deleted course & relations :D' });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -134,7 +134,7 @@ exports.getCourse = async (req, res, next) => {
 
     res.status(200).json({ message: 'Fetched course :D', course });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 }
 
@@ -148,7 +148,7 @@ exports.getCourses = async (req, res, next) => {
 
     res.status(200).json({ courses, subjects, lecturers, students, rooms });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -159,7 +159,7 @@ exports.getCoursesByLecturerId = async (req, res, next) => {
 
     res.status(200).json({ courses });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -170,7 +170,7 @@ exports.getCoursesBySubjectId = async (req, res, next) => {
 
     res.status(200).json({ courses });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -192,7 +192,7 @@ exports.getRegistrations = async (req, res, next) => {
       students: students
     })
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -246,6 +246,6 @@ exports.updateRegistration = async (req, res, next) => {
       message: 'Update registrations :D'
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };

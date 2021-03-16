@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const Admin = require('../../models/admin');
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 
@@ -30,7 +30,7 @@ exports.signup = async (req, res, next) => {
       userId: createdAdmin._id
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -62,7 +62,7 @@ exports.login = async (req, res, next) => {
       userId: admin._id.toString()
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   };
 };
 
@@ -92,6 +92,6 @@ exports.changePassword = async (req, res, next) => {
       userId: admin._id.toString()
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   };
 };

@@ -6,7 +6,7 @@ const Lecturer = require('../../models/lecturer');
 const Student = require('../../models/student');
 
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 
@@ -26,6 +26,6 @@ exports.getCourses = async (req, res, next) => {
       students
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };

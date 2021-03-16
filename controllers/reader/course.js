@@ -1,5 +1,5 @@
 const { getCurrentPeriod } = require('../../util/periods');
-const { checkStatusCode } = require('../../util/error-handler');
+const { errorHandler } = require('../../util/error-handler');
 
 const Course = require('../../models/course');
 const Room = require('../../models/room');
@@ -35,6 +35,6 @@ exports.getCurrentCourse = async (req, res, next) => {
       })
     }
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };

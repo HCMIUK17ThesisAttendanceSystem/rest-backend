@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const Lecturer = require('../../models/lecturer');
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 const {
@@ -35,7 +35,7 @@ exports.createLecturer = async (req, res, next) => {
       lecturer
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   };
 };
 
@@ -58,7 +58,7 @@ exports.updateLecturerPassword = async (req, res, next) => {
       lecturerId: lecturer._id
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -70,7 +70,7 @@ exports.getLecturers = async (req, res, next) => {
       lecturers
     })
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -91,6 +91,6 @@ exports.deleteLecturer = async (req, res, next) => {
       message: 'Lecturer & courses\' relationships removed'
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };

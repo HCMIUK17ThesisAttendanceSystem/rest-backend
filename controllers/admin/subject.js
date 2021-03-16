@@ -2,7 +2,7 @@ const { validationResult } = require('express-validator');
 
 const Subject = require('../../models/subject');
 const {
-  checkStatusCode,
+  errorHandler,
   createError
 } = require('../../util/error-handler');
 
@@ -27,7 +27,7 @@ exports.createSubject = async (req, res, next) => {
       subject
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -39,7 +39,7 @@ exports.getSubjects = async (req, res, next) => {
       subjects
     })
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -56,7 +56,7 @@ exports.getSubject = async (req, res, next) => {
       subject
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -82,7 +82,7 @@ exports.updateSubject = async (req, res, next) => {
       subject
     })
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -100,6 +100,6 @@ exports.deleteSubject = async (req, res, next) => {
       subjectName: subject.name
     });
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };

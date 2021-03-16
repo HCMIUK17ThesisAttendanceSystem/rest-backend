@@ -5,7 +5,7 @@ const Room = require('../../models/room');
 
 const {
   createError,
-  checkStatusCode
+  errorHandler
 } = require('../../util/error-handler');
 const io = require('../../util/socket');
 
@@ -57,7 +57,7 @@ exports.checkAttendance = async (req, res, next) => {
       res.status(200).json({ message: "No student data :D" });
     }
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
 
@@ -67,6 +67,6 @@ exports.checkAttendanceByRoom = async (req, res, next) => {
   try {
 
   } catch (error) {
-    checkStatusCode(error, next);
+    errorHandler(req, error, next);
   }
 };
