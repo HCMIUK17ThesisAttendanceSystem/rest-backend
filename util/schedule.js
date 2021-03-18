@@ -17,7 +17,9 @@ exports.emitScheduledCourses = async (period) => {
       _id: course._id,
       SubjectName: course.subjectId.name,
       SubjectId: course.subjectId.id,
-      RoomCode: course.roomId.code
+      RoomCode: course.roomId.code,
+      Periods: currentCourse.periods,
+      Weekday: currentWeekday
     };
     result.push(obj);
   });

@@ -8,11 +8,13 @@ exports.getCurrentCourse = async (req, res, next) => {
   try {
     const { roomCode } = req.params;
     const currentPeriod = getCurrentPeriod();
+    const currentWeekday = new Date().getDay().toString();
     if (currentPeriod) {
       const room = await Room.findOne({ code: roomCode });
       const currentCourse = await Course.findOne({
         roomId: room._id,
-        periods: currentPeriod
+        periods: currentPeriod,
+        weekday: currentWeekday
       }).populate('subjectId', 'name id');
 
       if (currentCourse)
@@ -20,7 +22,9 @@ exports.getCurrentCourse = async (req, res, next) => {
           _id: currentCourse._id,
           SubjectName: currentCourse.subjectId.name,
           SubjectId: currentCourse.subjectId.id,
-          RoomCode: roomCode
+          RoomCode: roomCode,
+          Periods: currentCourse.periods,
+          Weekday: currentWeekday
         });
       else res.status(404).json({
         message: `No course for ${roomCode} now :D`
