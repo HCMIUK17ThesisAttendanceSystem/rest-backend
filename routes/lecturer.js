@@ -30,6 +30,9 @@ Router.post('/login',
 //________________________________________________________________
 // GET /lecturer/courses
 Router.get('/courses', isAuth, courseController.getCourses);
+
+// GET /lecturer/current-course
+Router.get('/current-course', isAuth, courseController.getCurrentCourse);
 //________________________________________________________________
 
 

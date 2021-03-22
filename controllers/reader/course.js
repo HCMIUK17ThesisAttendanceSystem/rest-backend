@@ -32,7 +32,7 @@ exports.getCurrentCourse = async (req, res, next) => {
     } else {
       res.status(404).json({
         message: 'No course currently :D'
-      })
+      });
     }
   } catch (error) {
     errorHandler(req, error, next);

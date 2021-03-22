@@ -2,8 +2,10 @@ const { validationResult } = require('express-validator');
 
 const Course = require('../../models/course');
 const Subject = require('../../models/subject');
-const Lecturer = require('../../models/lecturer');
 const Student = require('../../models/student');
+const Attendance = require('../../models/attendance');
+
+const { getCurrentPeriod } = require('../../util/periods');
 
 const {
   errorHandler,
@@ -12,10 +14,10 @@ const {
 
 exports.getCourses = async (req, res, next) => {
   try {
-    const courses = await Course.find({ lecturerId: req.userId }); // req.userId from is-auth
+    const courses = await Course.find({ lecturerId: req.userId }).populate('roomId', 'code'); // req.userId from is-auth
     if (!courses)
       throw createError('No available courses for this lecturer D:', 404);
-    
+
     const subjects = await Subject.find(null, 'name id');
     const students = await Student.find(null, 'name id');
 
@@ -25,6 +27,64 @@ exports.getCourses = async (req, res, next) => {
       subjects,
       students
     });
+  } catch (error) {
+    errorHandler(req, error, next);
+  }
+};
+
+exports.getCurrentCourse = async (req, res, next) => {
+  try {
+    const currentPeriod = getCurrentPeriod();
+    const currentWeekday = new Date().getDay().toString();
+    if (currentPeriod) {
+      const currentCourse = await Course.findOne({
+        lecturerId: req.userId,
+        periods: currentPeriod,
+        weekday: currentWeekday
+      })
+        .populate('subjectId', 'name id')
+        .populate('roomId', 'code');
+
+      if (currentCourse) {
+        const todayAtZero = new Date().setHours(0, 0, 0, 0);
+        const attendanceCount = await Attendance.find({
+          courseId: currentCourse._id,
+          createdAt: { $gt: todayAtZero }
+        }).countDocuments();
+        const recentAttendance = await Attendance.findOne({
+          courseId: currentCourse._id,
+          createdAt: { $gt: todayAtZero }
+        }, {}, {
+          sort: {
+            'createdAt': -1
+          }
+        })
+          .populate('studentId', 'name');
+
+        res.status(200).json({
+          message: 'Fetched current course :D',
+          currentCourse: {
+            _id: currentCourse._id,
+            roomCode: currentCourse.roomId.code,
+            subjectName: currentCourse.subjectId.name,
+            weekday: currentCourse.weekday,
+            startPeriod: currentCourse.periods[0],
+            endPeriod: currentCourse.periods[currentCourse.periods.length - 1],
+            attendanceCount: attendanceCount,
+            recentAttendee: recentAttendance 
+              ? recentAttendance.studentId.name
+              : ''
+          }
+        });
+      }
+      else res.status(200).json({
+        message: `No course for you now :D`
+      });
+    } else {
+      res.status(200).json({
+        message: 'No course currently :D'
+      });
+    }
   } catch (error) {
     errorHandler(req, error, next);
   }

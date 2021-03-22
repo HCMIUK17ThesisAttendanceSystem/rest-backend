@@ -31,22 +31,27 @@ exports.checkAttendance = async (req, res, next) => {
           existingAttendance.checkTimes.push(new Date());
           await existingAttendance.save();
         } else {
+          io.getIO().emit('attendance', {
+            action: 'processing',
+            courseId: course._id,
+          });
           const attendance = new Attendance({
             courseId: course._id,
             studentId: student._id,
             checkTimes: [new Date()]
           });
           await attendance.save();
+          io.getIO().emit('attendance', {
+            action: 'create',
+            courseId: course._id,
+            studentName: student.name
+          });
         }
       } else {
         // to different model
         console.log("Student does not registered for this course :D");
       }
 
-      io.getIO().emit('attendance', {
-        action: 'create',
-        studentName: student.name
-      });
       res.status(201).json({
         message: studentInCourse ?
           'Check attendance successfully :D' :
