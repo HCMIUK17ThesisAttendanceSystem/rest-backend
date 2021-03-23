@@ -16,6 +16,10 @@ exports.checkAttendance = async (req, res, next) => {
     const course = await Course.findById(courseId);
     if (!course)
       throw createError('Course not found', 404);
+    io.getIO().emit('attendance', {
+      action: 'processing',
+      courseId: course._id,
+    });
 
     const student = await Student.findOne({ rfidTag });
     if (student) {
@@ -30,11 +34,12 @@ exports.checkAttendance = async (req, res, next) => {
         if (existingAttendance) {
           existingAttendance.checkTimes.push(new Date());
           await existingAttendance.save();
-        } else {
           io.getIO().emit('attendance', {
-            action: 'processing',
+            action: 'update',
             courseId: course._id,
+            studentName: student.name
           });
+        } else {
           const attendance = new Attendance({
             courseId: course._id,
             studentId: student._id,
@@ -49,6 +54,11 @@ exports.checkAttendance = async (req, res, next) => {
         }
       } else {
         // to different model
+        io.getIO().emit('attendance', {
+          action: 'no-action',
+          courseId: course._id,
+          studentName: student.name
+        });
         console.log("Student does not registered for this course :D");
       }
 

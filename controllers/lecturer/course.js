@@ -61,6 +61,27 @@ exports.getCurrentCourse = async (req, res, next) => {
         })
           .populate('studentId', 'name');
 
+        const attendanceGroupByDate = await Attendance.aggregate([
+          {
+            $match: {
+              courseId: currentCourse._id
+            }
+          },
+          {
+            $group: {
+              _id: {
+                $dateToString: { format: "%d-%m-%Y", date: "$createdAt" }
+              },
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $sort: {
+              '_id': 1
+            }
+          },
+        ]);
+        console.log(attendanceGroupByDate)
         res.status(200).json({
           message: 'Fetched current course :D',
           currentCourse: {
@@ -71,9 +92,10 @@ exports.getCurrentCourse = async (req, res, next) => {
             startPeriod: currentCourse.periods[0],
             endPeriod: currentCourse.periods[currentCourse.periods.length - 1],
             attendanceCount: attendanceCount,
-            recentAttendee: recentAttendance 
+            recentAttendee: recentAttendance
               ? recentAttendance.studentId.name
-              : ''
+              : '',
+            attendanceGroupByDate: attendanceGroupByDate
           }
         });
       }
