@@ -69,6 +69,11 @@ exports.checkAttendance = async (req, res, next) => {
         student: student.name
       });
     } else {
+      io.getIO().emit('attendance', {
+          action: 'no-action',
+          courseId: course._id,
+          studentName: student.name
+        });
       res.status(200).json({ message: "No student data :D" });
     }
   } catch (error) {

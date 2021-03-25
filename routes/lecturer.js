@@ -2,12 +2,10 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const isAuth = require('../util/is-auth');
-const { createError } = require('../util/error-handler');
 
 const authController = require('../controllers/lecturer/auth');
 const courseController = require('../controllers/lecturer/course');
-
-const Lecturer = require('../models/lecturer');
+const attendanceController = require('../controllers/lecturer/attendance');
 
 const Router = express.Router();
 // Authorization
@@ -35,5 +33,12 @@ Router.get('/courses', isAuth, courseController.getCourses);
 Router.get('/current-course', isAuth, courseController.getCurrentCourse);
 //________________________________________________________________
 
+
+// Manage attendance
+//________________________________________________________________
+// GET /lecturer/overall-attendance/:courseId
+Router.get('/overall-attendance/:courseId', isAuth, attendanceController.getOverallReport);
+
+//________________________________________________________________
 
 module.exports = Router;

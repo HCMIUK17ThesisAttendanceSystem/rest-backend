@@ -1,5 +1,3 @@
-const { validationResult } = require('express-validator');
-
 const Course = require('../../models/course');
 const Subject = require('../../models/subject');
 const Student = require('../../models/student');
@@ -81,7 +79,6 @@ exports.getCurrentCourse = async (req, res, next) => {
             }
           },
         ]);
-        console.log(attendanceGroupByDate)
         res.status(200).json({
           message: 'Fetched current course :D',
           currentCourse: {

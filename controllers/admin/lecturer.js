@@ -51,7 +51,7 @@ exports.updateLecturerPassword = async (req, res, next) => {
     lecturer.password = newHashedPassword;
     await lecturer.save();
 
-    await updateLecturerPasswordEmail(lecturer.email, newPassword, lecturer.name);
+    //await updateLecturerPasswordEmail(lecturer.email, newPassword, lecturer.name);
 
     res.status(200).json({
       message: 'Updated lecturer\'s password :D',
