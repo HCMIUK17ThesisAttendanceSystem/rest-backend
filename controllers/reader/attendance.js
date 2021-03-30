@@ -63,18 +63,19 @@ exports.checkAttendance = async (req, res, next) => {
       }
 
       res.status(201).json({
-        message: studentInCourse ?
-          'Check attendance successfully :D' :
-          'Student does not registered for this course :D',
-        student: student.name
+        Name: student.name,
+        Registered: studentInCourse
       });
     } else {
       io.getIO().emit('attendance', {
-          action: 'no-action',
-          courseId: course._id,
-          studentName: student.name
-        });
-      res.status(200).json({ message: "No student data :D" });
+        action: 'no-action',
+        courseId: course._id,
+        studentName: "No student data :D"
+      });
+      res.status(200).json({
+        Name: 'Unknown',
+        Registered: false
+      });
     }
   } catch (error) {
     errorHandler(req, error, next);

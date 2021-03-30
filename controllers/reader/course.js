@@ -24,6 +24,7 @@ exports.getCurrentCourse = async (req, res, next) => {
           SubjectId: currentCourse.subjectId.id,
           RoomCode: roomCode,
           Periods: currentCourse.periods,
+          CurrentPeriod: currentPeriod,
           Weekday: currentWeekday
         });
       else res.status(404).json({

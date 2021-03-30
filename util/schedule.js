@@ -1,6 +1,7 @@
 const io = require('./socket');
 
 const Course = require('../models/course');
+const { getCurrentPeriod } = require('./periods');
 
 exports.emitScheduledCourses = async (period) => {
   const currWeekday = new Date().getDay().toString();
@@ -18,8 +19,9 @@ exports.emitScheduledCourses = async (period) => {
       SubjectName: course.subjectId.name,
       SubjectId: course.subjectId.id,
       RoomCode: course.roomId.code,
-      Periods: currentCourse.periods,
-      Weekday: currentWeekday
+      Periods: course.periods,
+      CurrentPeriod: getCurrentPeriod(),
+      Weekday: currWeekday
     };
     result.push(obj);
   });
