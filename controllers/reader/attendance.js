@@ -23,8 +23,8 @@ exports.checkAttendance = async (req, res, next) => {
 
     const student = await Student.findOne({ rfidTag });
     if (student) {
-      const studentInCourse = course.regStudentIds.includes(student._id);
-      if (studentInCourse) {
+      const isStudentInCourse = course.regStudentIds.includes(student._id);
+      if (isStudentInCourse) {
         const todayAtZero = new Date().setHours(0, 0, 0, 0);
         const existingAttendance = await Attendance.findOne({
           studentId: student._id,
@@ -64,7 +64,7 @@ exports.checkAttendance = async (req, res, next) => {
 
       res.status(201).json({
         Name: student.name,
-        Registered: studentInCourse
+        Registered: isStudentInCourse
       });
     } else {
       io.getIO().emit('attendance', {

@@ -12,7 +12,8 @@ const {
 
 exports.getCourses = async (req, res, next) => {
   try {
-    const courses = await Course.find({ lecturerId: req.userId }).populate('roomId', 'code'); // req.userId from is-auth
+    const courses = await Course.find({ lecturerId: req.userId })
+      .populate('roomId', 'code');
     if (!courses)
       throw createError('No available courses for this lecturer D:', 404);
 
@@ -29,6 +30,83 @@ exports.getCourses = async (req, res, next) => {
     errorHandler(req, error, next);
   }
 };
+
+exports.downloadOverallReport = async (req, res, next) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId, 'periods classType weekday roomId lecturerId subjectId')
+      .populate('subjectId', '-_id name id')
+      .populate('roomId', '-_id code')
+      .populate('lecturerId', '-_id name');
+    if (!course)
+      throw createError('Course not found D:', 404);
+
+    const attendanceDateAgg = await Attendance.aggregate([
+      {
+        $match: {
+          courseId: course._id
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { date: "$createdAt", format: "%Y-%m-%d" }
+          }
+        }
+      },
+      {
+        $sort: {
+          _id: 1
+        }
+      },
+    ]);
+    const attendanceDates = attendanceDateAgg.map(d => d._id.split('-').reverse().join('-'));
+
+    const attendancesGroupByStudentId = await Attendance.aggregate([
+      {
+        $match: {
+          courseId: course._id
+        }
+      },
+      {
+        $group: {
+          _id: "$studentId",
+          attendDates: {
+            $addToSet: {
+              $dateToString: { date: "$createdAt", format: "%d-%m-%Y" },
+            }
+          }
+        }
+      }
+    ]);
+    const populatedAttendances = await Student.populate(attendancesGroupByStudentId, {
+      path: '_id',
+      select: 'name id'
+    });
+    const studentAttendances = populatedAttendances.map(a => {
+      let attendances = [];
+      attendanceDates.forEach(date => {
+        if (a.attendDates.includes(date))
+          attendances.push(1);
+        else
+          attendances.push(0);
+      });
+      return {
+        id: a._id.id,
+        name: a._id.name,
+        attendances: attendances
+      };
+    });
+    console.log(course, attendanceDates, studentAttendances);
+    res.status(200).json({
+      course,
+      attendanceDates,
+      studentAttendances
+    });
+  } catch (error) {
+    errorHandler(req, error, next);
+  }
+}
 
 exports.getCurrentCourse = async (req, res, next) => {
   try {

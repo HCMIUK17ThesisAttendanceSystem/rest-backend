@@ -31,6 +31,9 @@ Router.get('/courses', isAuth, courseController.getCourses);
 
 // GET /lecturer/current-course
 Router.get('/current-course', isAuth, courseController.getCurrentCourse);
+
+// GET /lecturer/overall-report/:courseId
+Router.get('/overall-report/:courseId', isAuth, courseController.downloadOverallReport);
 //________________________________________________________________
 
 
