@@ -33,14 +33,14 @@ Router.get('/courses', isAuth, courseController.getCourses);
 Router.get('/current-course', isAuth, courseController.getCurrentCourse);
 
 // GET /lecturer/overall-report/:courseId
-Router.get('/overall-report/:courseId', isAuth, courseController.downloadOverallReport);
+Router.get('/overall-report/:courseId', isAuth, courseController.downloadAttendanceReport);
 //________________________________________________________________
 
 
 // Manage attendance
 //________________________________________________________________
 // GET /lecturer/overall-attendance/:courseId
-Router.get('/overall-attendance/:courseId', isAuth, attendanceController.getOverallReport);
+Router.get('/overall-attendance/:courseId', isAuth, attendanceController.getAttendanceReport);
 
 //________________________________________________________________
 

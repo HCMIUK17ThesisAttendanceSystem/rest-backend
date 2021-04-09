@@ -4,7 +4,7 @@ const Student = require('../../models/student');
 const Attendance = require('../../models/attendance');
 
 const { getCurrentPeriod } = require('../../util/periods');
-
+const { getAttendanceReport } = require('./util/attendance-function');
 const {
   errorHandler,
   createError
@@ -31,78 +31,12 @@ exports.getCourses = async (req, res, next) => {
   }
 };
 
-exports.downloadOverallReport = async (req, res, next) => {
+exports.downloadAttendanceReport = async (req, res, next) => {
   try {
     const { courseId } = req.params;
-    const course = await Course.findById(courseId, 'periods classType weekday roomId lecturerId subjectId')
-      .populate('subjectId', '-_id name id')
-      .populate('roomId', '-_id code')
-      .populate('lecturerId', '-_id name');
-    if (!course)
-      throw createError('Course not found D:', 404);
-
-    const attendanceDateAgg = await Attendance.aggregate([
-      {
-        $match: {
-          courseId: course._id
-        }
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: { date: "$createdAt", format: "%Y-%m-%d" }
-          }
-        }
-      },
-      {
-        $sort: {
-          _id: 1
-        }
-      },
-    ]);
-    const attendanceDates = attendanceDateAgg.map(d => d._id.split('-').reverse().join('-'));
-
-    const attendancesGroupByStudentId = await Attendance.aggregate([
-      {
-        $match: {
-          courseId: course._id
-        }
-      },
-      {
-        $group: {
-          _id: "$studentId",
-          attendDates: {
-            $addToSet: {
-              $dateToString: { date: "$createdAt", format: "%d-%m-%Y" },
-            }
-          }
-        }
-      }
-    ]);
-    const populatedAttendances = await Student.populate(attendancesGroupByStudentId, {
-      path: '_id',
-      select: 'name id'
-    });
-    const studentAttendances = populatedAttendances.map(a => {
-      let attendances = [];
-      attendanceDates.forEach(date => {
-        if (a.attendDates.includes(date))
-          attendances.push(1);
-        else
-          attendances.push(0);
-      });
-      return {
-        id: a._id.id,
-        name: a._id.name,
-        attendances: attendances
-      };
-    });
-    console.log(course, attendanceDates, studentAttendances);
-    res.status(200).json({
-      course,
-      attendanceDates,
-      studentAttendances
-    });
+    const report = await getAttendanceReport(courseId);
+    console.log(report);
+    res.status(200).json({ ...report });
   } catch (error) {
     errorHandler(req, error, next);
   }
