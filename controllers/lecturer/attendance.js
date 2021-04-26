@@ -1,7 +1,7 @@
 const excel = require('exceljs');
 
 const { getAttendanceReport } = require('./util/attendance-function');
-const { createAttendanceReport } = require('./util/excel-function');
+// const { createAttendanceReport } = require('./util/excel-function');
 
 const { errorHandler } = require('../../util/error-handler');
 
@@ -31,36 +31,38 @@ exports.downloadAttendanceReport = async (req, res, next) => {
 
     // Creating columns
     let columns = [
-      { header: '#', key: '#' },
-      { header: 'Student ID', key: 'id' },
-      { header: 'Student Name', key: 'name' }
+      { header: '#', key: 'index' },
+      { header: 'Student ID', key: 'studentId' },
+      { header: 'Student Name', key: 'studentName' }
     ];
-    dates.forEach(date => columns.push({
-      header: date._id,
-      key: date._id
+    dates.forEach((date, index) => columns.push({
+      header: date,
+      key: index + ''
     }));
     worksheet.columns = columns;
 
     // Formatting headers
-    // force the columns to be at least as long as their header row.
-    // Have to take this approach because ExcelJS doesn't have an autofit property.
-    // worksheet.columns.forEach(column => {
-    //   column.width = column.header.length < 12 ? 12 : column.header.length
-    // });
+    const studentNameColWidth = studentAttendances.reduce((a, b) => a.name.length > b.name.length ? a : b)
+      .name.length + 5;
+    worksheet.columns.forEach(column => {
+      column.width = column.key === 'studentName'
+        ? studentNameColWidth
+        : (column.header.length < 12 ? 12 : column.header.length + 10)
+    });
     // Make the header bold.
-    // Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
     worksheet.getRow(1).font = { bold: true };
 
     // Dump all the data into Excel
-    studentAttendances.forEach((e, index) => {
-      // row 1 is the header.
-      //const rowIndex = index + 2;
-      // By using destructuring we can easily dump all of the data into the row without doing much
-      // We can add formulas pretty easily by providing the formula property.
-      worksheet.addRow({
+    studentAttendances.forEach((data, idx) => {
+      const results = data.attendances.map(a => a ? 'x' : '');
+      const index = idx + 1;
+      const row = {
         index,
-        ...e
-      });
+        studentId: data.id,
+        studentName: data.name,
+        ...results
+      };
+      worksheet.addRow(row);
     });
 
     // Send response

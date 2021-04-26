@@ -23,7 +23,7 @@ exports.getAttendanceReport = async (courseId) => {
     {
       $group: {
         _id: {
-          $dateToString: { date: "$createdAt", format: "%Y-%m-%d" }
+          $dateToString: { date: "$createdAt", format: "%Y/%m/%d" }
         }
       }
     },
@@ -33,7 +33,7 @@ exports.getAttendanceReport = async (courseId) => {
       }
     },
   ]);
-  const dates = attendanceDateAgg.map(d => d._id.split('-').reverse().join('-'));
+  const dates = attendanceDateAgg.map(d => d._id.split('/').reverse().join('/'));
 
   const attendancesGroupByStudentId = await Attendance.aggregate([
     {
@@ -46,7 +46,7 @@ exports.getAttendanceReport = async (courseId) => {
         _id: "$studentId",
         attendDates: {
           $addToSet: {
-            $dateToString: { date: "$createdAt", format: "%d-%m-%Y" },
+            $dateToString: { date: "$createdAt", format: "%d/%m/%Y" },
           }
         }
       }
