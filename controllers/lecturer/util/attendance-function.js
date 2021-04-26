@@ -85,6 +85,5 @@ exports.getAttendanceReport = async (courseId) => {
     dates: dates,
     studentAttendances: studentAttendances
   };
-  console.log(result);
   return result;
 };

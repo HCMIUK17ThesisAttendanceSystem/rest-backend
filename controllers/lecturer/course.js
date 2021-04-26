@@ -71,7 +71,7 @@ exports.getCurrentCourse = async (req, res, next) => {
         })
           .populate('studentId', 'name');
 
-        const attendanceGroupByDate = await Attendance.aggregate([
+        const attendanceDateAgg = await Attendance.aggregate([
           {
             $match: {
               courseId: currentCourse._id
@@ -80,7 +80,7 @@ exports.getCurrentCourse = async (req, res, next) => {
           {
             $group: {
               _id: {
-                $dateToString: { format: "%d-%m-%Y", date: "$createdAt" }
+                $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
               },
               count: { $sum: 1 }
             }
@@ -91,6 +91,8 @@ exports.getCurrentCourse = async (req, res, next) => {
             }
           },
         ]);
+        const attendanceGroupByDate = attendanceDateAgg.map(d => d._id.split('-').reverse().join('-'));
+        
         res.status(200).json({
           message: 'Fetched current course :D',
           currentCourse: {

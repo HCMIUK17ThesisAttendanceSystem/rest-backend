@@ -42,6 +42,7 @@ Router.get('/overall-report/:courseId', isAuth, courseController.downloadAttenda
 // GET /lecturer/overall-attendance/:courseId
 Router.get('/overall-attendance/:courseId', isAuth, attendanceController.getAttendanceReport);
 
+Router.get('/download-report/:courseId', isAuth, attendanceController.downloadAttendanceReport);
 //________________________________________________________________
 
 module.exports = Router;
