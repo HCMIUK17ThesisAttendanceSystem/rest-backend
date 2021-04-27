@@ -91,7 +91,13 @@ exports.getCurrentCourse = async (req, res, next) => {
             }
           },
         ]);
-        const attendanceGroupByDate = attendanceDateAgg.map(d => d._id.split('-').reverse().join('-'));
+        const attendanceGroupByDate = attendanceDateAgg.map(d => {
+          const date = d._id.split('-').reverse().join('/');
+          return {
+            count: d.count,
+            date: date 
+          };
+        });
         
         res.status(200).json({
           message: 'Fetched current course :D',
