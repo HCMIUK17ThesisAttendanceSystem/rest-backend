@@ -1,69 +1,85 @@
-const nodemailer = require('nodemailer');
+const path = require('path');
 
-exports.transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'your email',
-    pass: 'your password'
-  }
-});
+const ejs = require("ejs");
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 
-exports.createLecturerEmail = (toEmail, password, name) => {
-  return {
-    from: 'HCMIU Presence',
-    to: toEmail,
-    subject: 'Welcome to Presence :D',
-    html: `
-      <h4>Welcome ${name}!</h4>
-      <p>We are glad to have you onboard :D</p>
-      <p>You can login to <a href="https://presence.hcmiu.edu.vn">Presence</a> using:<p>
-      <ul style="list-style-type: none">
-        <li>Email: ${toEmail}</li>
-        <li>Password: ${password}</li>
-      </ul>
-    `
-  };
-};
+const {
+  createError
+} = require('./error-handler');
 
-const nodemailer = require('nodemailer');
+const rootDir = path.dirname(require.main.filename);
 
-// async..await is not allowed in global scope, must use a wrapper
-exports.createLecturerEmail = async (toEmail, password, name) => {
-  // Generate test SMTP service account from ethereal.email
-  // Only needed if you don't have a real mail account for testing
-  let testAccount = await nodemailer.createTestAccount();
+const {
+  NODEMAILER_FROM_EMAIL,
+  NODEMAILER_REFRESH_TOKEN,
+  NODEMAILER_CLIENT_SECRET,
+  NODEMAILER_CLIENT_ID
+} = process.env;
 
-  // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
+const createTransporter = async () => {
+  const oauth2Client = new OAuth2(
+    NODEMAILER_CLIENT_ID,
+    NODEMAILER_CLIENT_SECRET,
+    "https://developers.google.com/oauthplayground"
+  );
+
+  oauth2Client.setCredentials({
+    refresh_token: NODEMAILER_REFRESH_TOKEN
+  });
+
+  const accessToken = await new Promise((resolve, reject) => {
+    oauth2Client.getAccessToken((err, token) => {
+      if (err) {
+        reject();
+      }
+      resolve(token);
+    });
+  });
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
     auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
-    },
+      type: "OAuth2",
+      user: NODEMAILER_FROM_EMAIL,
+      accessToken,
+      clientId: NODEMAILER_CLIENT_ID,
+      clientSecret: NODEMAILER_CLIENT_SECRET,
+      refreshToken: NODEMAILER_REFRESH_TOKEN
+    }
   });
 
-  // send mail with defined transport object
-  const info = await transporter.sendMail({
-    from: 'HCMIU Presence',
-    to: toEmail,
-    subject: 'Welcome to Presence :D',
-    html: `
-      <h4>Welcome ${name}!</h4>
-      <p>We are glad to have you onboard :D</p>
-      <p>You can login to <a href="https://presence.hcmiu.edu.vn">Presence</a> using:<p>
-      <ul style="list-style-type: none">
-        <li>Email: ${toEmail}</li>
-        <li>Password: ${password}</li>
-      </ul>
-    `
-  });
-
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-  // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+  return transporter;
 };
+
+//emailOptions - who sends what to whom
+const sendEmail = async (emailOptions) => {
+  const emailTransporter = await createTransporter();
+  await emailTransporter.sendMail(emailOptions, (error, info) => {
+    if (error)
+      console.log(error);
+    else
+      console.log(info);
+  });
+};
+
+exports.sendEmailWithTemplate = async (viewPath, data, toEmails, subject) => {
+  const path = rootDir + '/views/templates' + viewPath;
+  try {
+    const html = await ejs.renderFile(
+      path,
+      data,
+      { async: true }
+    );
+    const emailOptions = {
+      from: process.env.NODEMAILER_FROM_EMAIL,
+      to: toEmails,
+      subject,
+      html
+    };
+    sendEmail(emailOptions);
+  } catch (error) {
+    throw createError('Validation failed D:', 404, error);
+  }
+}

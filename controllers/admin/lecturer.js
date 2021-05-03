@@ -6,10 +6,7 @@ const {
   errorHandler,
   createError
 } = require('../../util/error-handler');
-const {
-  createLecturerEmail,
-  updateLecturerPasswordEmail
-} = require('../../util/mailer');
+const { sendEmailWithTemplate } = require('../../util/mailer-example');
 
 exports.createLecturer = async (req, res, next) => {
   try {
@@ -19,6 +16,8 @@ exports.createLecturer = async (req, res, next) => {
 
     const { email, password, name } = req.body;
 
+    await sendEmailWithTemplate('/welcome.ejs', { name }, email, 'Welcome to Presence!');
+
     const hashedPassword = await bcrypt.hash(password, 12);
     const lecturer = new Lecturer({
       email,
@@ -26,8 +25,6 @@ exports.createLecturer = async (req, res, next) => {
       name
     });
     const createdLecturer = await lecturer.save();
-
-    await createLecturerEmail(email, password, name);
 
     res.status(201).json({
       message: 'Lecturer created :D',
