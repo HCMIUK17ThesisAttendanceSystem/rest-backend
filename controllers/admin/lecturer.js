@@ -16,7 +16,7 @@ exports.createLecturer = async (req, res, next) => {
 
     const { email, password, name } = req.body;
 
-    await sendEmailWithTemplate('/welcome.ejs', { name }, email, 'Welcome to Presence!');
+    await sendEmailWithTemplate('/welcome.ejs', { name, email, password }, email, 'Welcome to Presence!');
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const lecturer = new Lecturer({
@@ -80,13 +80,17 @@ exports.deleteLecturer = async (req, res, next) => {
     if (!lecturer)
       throw createError('Lecturer not found D:', 404);
 
-    await Lecturer.findByIdAndRemove(lecturerId);
-    // find all courses where lecturer = lecId
-    // remove relation
+    if (lecturer.courseIds.length > 0) {
+      res.status(302).json({
+        message: 'Can\'t delete lecturer with courses'
+      });
+    } else {
+      await Lecturer.findByIdAndRemove(lecturerId);
 
-    res.status(200).json({
-      message: 'Lecturer & courses\' relationships removed'
-    });
+      res.status(200).json({
+        message: 'Lecturer removed'
+      });
+    }
   } catch (error) {
     errorHandler(req, error, next);
   }
