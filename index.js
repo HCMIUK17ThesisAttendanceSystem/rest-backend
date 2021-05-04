@@ -18,6 +18,7 @@ const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
 const { periods } = require('./util/periods');
+const Attendance = require('./models/attendance');
 
 const app = express();
 
@@ -91,6 +92,18 @@ mongoose.connect(
         console.log(reason);
       });
     });
+  })
+  .then(async () => {
+    const attendance = await Attendance.find({ note: { $exists: true } })
+    console.log(attendance)
+    attendance.forEach(a => {
+      if (!Array.isArray(a.note)) {
+        const newNote = [a.note];
+        a.note = newNote;
+        a.save();
+      }
+    })
+    console.log(attendance)
   })
   .catch(err => console.log(err));
 
