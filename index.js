@@ -93,18 +93,18 @@ mongoose.connect(
       });
     });
   })
-  .then(async () => {
-    const attendance = await Attendance.find({ note: { $exists: true } })
-    console.log(attendance)
-    attendance.forEach(a => {
-      if (!Array.isArray(a.note)) {
-        const newNote = [a.note];
-        a.note = newNote;
-        a.save();
-      }
-    })
-    console.log(attendance)
-  })
+  // .then(async () => {
+  //   const attendance = await Attendance.find({ note: { $exists: true } })
+  //   console.log(attendance)
+  //   attendance.forEach(a => {
+  //     if (!Array.isArray(a.note)) {
+  //       const newNote = [a.note];
+  //       a.note = newNote;
+  //       a.save();
+  //     }
+  //   })
+  //   console.log(attendance)
+  // })
   .catch(err => console.log(err));
 
 // const csrfProtection = csrf();
