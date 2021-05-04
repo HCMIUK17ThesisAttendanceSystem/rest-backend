@@ -39,6 +39,9 @@ Router.get('/overall-report/:courseId', isAuth, courseController.downloadAttenda
 
 // Manage attendance
 //________________________________________________________________
+// POST /lecturer/attendance
+Router.post('/attendance', isAuth, attendanceController.postAttendance);
+
 // GET /lecturer/overall-attendance/:courseId
 Router.get('/overall-attendance/:courseId', isAuth, attendanceController.getAttendanceReport);
 

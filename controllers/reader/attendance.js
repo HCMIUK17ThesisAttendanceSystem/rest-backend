@@ -54,7 +54,7 @@ exports.checkAttendance = async (req, res, next) => {
           });
         }
       } else {
-        // to different model
+        // TODO to different model
         io.getIO().emit('attendance', {
           action: 'no-action',
           courseId: course._id,

@@ -3,7 +3,12 @@ const excel = require('exceljs');
 const { getAttendanceReport } = require('./util/attendance-function');
 // const { createAttendanceReport } = require('./util/excel-function');
 
-const { errorHandler } = require('../../util/error-handler');
+const { errorHandler, createError } = require('../../util/error-handler');
+const io = require('../../util/socket');
+
+const Student = require('../../models/student');
+const Course = require('../../models/course');
+const Attendance = require('../../models/attendance');
 
 exports.getAttendanceReport = async (req, res, next) => {
   try {
@@ -70,6 +75,53 @@ exports.downloadAttendanceReport = async (req, res, next) => {
     res.setHeader('Content-Disposition', 'attachment; filename=' + 'report.xlsx');
     return workbook.xlsx.write(res)
       .then(() => res.status(200).end());
+  } catch (error) {
+    errorHandler(req, error, next);
+  }
+};
+
+exports.postAttendance = async (req, res, next) => {
+  const { studentId, courseId, note } = req.body;
+  try {
+    // check student exist
+    const student = await Student.findById(studentId);
+    if (!student)
+      throw createError('Student not found D:', 404);
+
+    // check course exist and lecturer teach
+    const course = await Course.findById(courseId);
+    if (!course)
+      throw createError('Course not found D:', 404);
+    if (course.lecturerId !== req.userId)
+      throw createError('Lecturer is not authenticated to add attendance for this course!', 401);
+
+    // check if student registered the course
+    const isStudentInCourse = course.regStudentIds.includes(student._id);
+    if (!isStudentInCourse)
+      throw createError('Student did not register for this course!', 400);
+
+    // check if already check attendance
+    const todayAtZero = new Date().setHours(0, 0, 0, 0);
+    const existingAttendance = await Attendance.findOne({
+      studentId: student._id,
+      courseId: course._id,
+      createdAt: { $gt: todayAtZero }
+    });
+    if (existingAttendance)
+      throw createError('Student has already checked attendance!', 400);
+
+    const attendance = new Attendance({
+      studentId: student._id,
+      courseId: course._id,
+      note
+    });
+    await attendance.save();
+
+    res.status(201).json({
+      message: 'Check attendance successfully',
+      studentName: student.name,
+      attendance
+    });
   } catch (error) {
     errorHandler(req, error, next);
   }

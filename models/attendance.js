@@ -15,7 +15,8 @@ const attendanceSchema = new Schema({
   checkTimes: [{
     type: Date,
     default: Date.now()
-  }]
+  }],
+  note: String
 }, { timestamps: true });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);
