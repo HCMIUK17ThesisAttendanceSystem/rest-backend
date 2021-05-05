@@ -49,18 +49,23 @@ exports.getCurrentCourse = async (req, res, next) => {
     if (currentPeriod) {
       const currentCourse = await Course.findOne({
         lecturerId: req.userId,
+        // lecturerId: '6046d67ffa42780004beaaa7',
         periods: currentPeriod,
         weekday: currentWeekday
       })
         .populate('subjectId', 'name id')
-        .populate('roomId', 'code');
+        .populate('roomId', 'code')
+        .populate('regStudentIds', 'id name');
 
       if (currentCourse) {
         const todayAtZero = new Date().setHours(0, 0, 0, 0);
-        const attendanceCount = await Attendance.find({
+        // get current attendance
+        const currentAttendance = await Attendance.find({
           courseId: currentCourse._id,
           createdAt: { $gt: todayAtZero }
-        }).countDocuments();
+        });
+
+        // get recent attendee
         const recentAttendance = await Attendance.findOne({
           courseId: currentCourse._id,
           createdAt: { $gt: todayAtZero }
@@ -71,6 +76,7 @@ exports.getCurrentCourse = async (req, res, next) => {
         })
           .populate('studentId', 'name');
 
+        // get attendance heartbeat
         const attendanceDateAgg = await Attendance.aggregate([
           {
             $match: {
@@ -95,10 +101,10 @@ exports.getCurrentCourse = async (req, res, next) => {
           const date = d._id.split('-').reverse().join('/');
           return {
             count: d.count,
-            date: date 
+            date: date
           };
         });
-        
+
         res.status(200).json({
           message: 'Fetched current course :D',
           currentCourse: {
@@ -108,7 +114,8 @@ exports.getCurrentCourse = async (req, res, next) => {
             weekday: currentCourse.weekday,
             startPeriod: currentCourse.periods[0],
             endPeriod: currentCourse.periods[currentCourse.periods.length - 1],
-            attendanceCount: attendanceCount,
+            regStudents: currentCourse.regStudentIds,
+            currentAttendance: currentAttendance,
             recentAttendee: recentAttendance
               ? recentAttendance.studentId.name
               : '',
@@ -121,7 +128,7 @@ exports.getCurrentCourse = async (req, res, next) => {
       });
     } else {
       res.status(200).json({
-        message: 'No course currently :D'
+        message: 'No period currently :D'
       });
     }
   } catch (error) {

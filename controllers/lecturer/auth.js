@@ -29,11 +29,12 @@ exports.login = async (req, res, next) => {
         userId: lecturer._id.toString()
       },
       'asecretprivatekey',
-      { expiresIn: '1h' }
+      { expiresIn: '5h' }
     );
     res.status(200).json({
       token,
-      userId: lecturer._id.toString()
+      userId: lecturer._id.toString(),
+      expireTime: 60 * 60 * 5000 // 5 hours
     });
   } catch (error) {
     errorHandler(req, error, next);

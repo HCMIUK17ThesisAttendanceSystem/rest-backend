@@ -49,7 +49,8 @@ exports.checkAttendance = async (req, res, next) => {
           io.getIO().emit('attendance', {
             action: 'create',
             courseId: course._id,
-            studentName: student.name
+            studentName: student.name,
+            attendance
           });
         }
       } else {

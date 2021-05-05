@@ -1,43 +1,16 @@
 <style type="text/css">
   #container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
-
-  #account {
     font-family: Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
   }
 
-  #account td,
-  #account th {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-
-  #account tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-
-  #account tr:hover {
-    background-color: #ddd;
-  }
-
-  #account th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #4CAF50;
-    color: white;
-  }
-
-  a {
+  /* a {
     background-color: white;
     border: #4CAF50 1px solid;
     box-shadow: 0 5px 0 #4CAF50;
-    color: grey;
     padding: 1em 1.5em;
     position: relative;
     text-decoration: none;
@@ -46,13 +19,12 @@
 
   a:hover {
     background-color: #4CAF50;
-    color: white;
   }
 
   a:active {
     box-shadow: none;
     top: 5px;
-  }
+  } */
 </style>
 
 <!-- <wrapper class="header">
@@ -65,33 +37,40 @@
   </container>
 </wrapper> -->
 
-<container id="container">
-  <!-- <img src="/images/logo_invert.jpg" alt="PresenceLogo"/> -->
+<div id="container">
   <p>
-    Hello, <%= name %>!
+    Hello <%= name %>,
   </p>
-  <b>
-    Congratulations!!!
-  </b>
   <p>
-    Your account has been activated successfully!
+    <b>Congratulations!!!</b> Your account has been activated successfully!
   </p>
-  <table id="account">
+  <p>You can login using:</p>
+  <ul>
+    <li>Email: <b><%= email %></b>
+    </li>
+    <li>Password: <b><%= password %></b>
+    </li>
+  </ul>
+  <!-- <table id="account">
     <tr>
       <th>Email</th>
       <th>Password</th>
     </tr>
     <tr>
       <td>
-        <%=email%>
+        <%= email %>
       </td>
       <td>
-        <%=password%>
+        <%= password %>
       </td>
     </tr>
-  </table>
+  </table> -->
   <br />
   <a href="https://hcmiu-presence.web.app">
-    Proceed to Site
+    Login now
   </a>
-</container>
+  <br />
+  <p>Sincerely yours,</p>
+  <p>Presence</p>
+  <img src="static/images/logo_invert.jpg" alt="PresenceLogo"/>
+</div>

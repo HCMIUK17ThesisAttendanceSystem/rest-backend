@@ -1,0 +1,51 @@
+<style type="text/css">
+  #container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+</style>
+<div id="container">
+  <p>Hello <%= studentName %>, </p>
+  <p>Here is your weekly attendance report (<%= startDate %> - <%= endDate %>):</p>
+  <table>
+    <tr>
+      <th>Course name</th>
+      <th>Type</th>
+      <th>Weekday</th>
+      <th>Periods</th>
+      <th>Checkin time</th>
+    </tr>
+    <% courses.forEach(course=> { %>
+      <tr>
+        <td>
+          <%= course.name %>
+        </td>
+        <td>
+          <%= course.type %>
+        </td>
+        <td>
+          <%= course.weekday %>
+        </td>
+        <td>
+          <%= course.periods %>
+        </td>
+        <td>
+          <%= course.checkTime ? course.checkTime : null %>
+        </td>
+      </tr>
+      <% }); %>
+  </table>
+  <!-- 
+    Hello {name},
+    Here is your weekly attendance ({week# or date-date}) report:
+    <ul>
+      <li> {courseName, time, room}: {isPresent} -> {Warning or Praise}
+      ...
+    </ul>
+    Overall, {good job or be careful}
+    Signature
+   -->
+</div>

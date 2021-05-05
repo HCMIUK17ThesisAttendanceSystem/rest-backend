@@ -1,4 +1,5 @@
-if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+if (process.env.NODE_ENV !== 'production')
+  require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
 
@@ -32,7 +33,7 @@ app.use(cors());
 
 // app.use(bodyParser.urlencoded()) // x-www-form-urlencoded <form>
 app.use(bodyParser.json()) // application/json
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -65,6 +66,12 @@ const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
   period.cron,
   () => require('./util/schedule').emitScheduledCourses(period.number)
 ));
+
+schedule.scheduleJob(
+  '0 0 8 ? * SUN *',
+  () => require('./util/schedule').sendWeeklyReport()
+);
+// require('./util/schedule').sendWeeklyReport();
 
 mongoose.connect(
   mongooseUri,
