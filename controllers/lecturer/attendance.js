@@ -92,7 +92,7 @@ exports.postAttendance = async (req, res, next) => {
     const course = await Course.findById(courseId);
     if (!course)
       throw createError('Course not found D:', 404);
-    if (course.lecturerId !== req.userId)
+    if (req.userId !== course.lecturerId.toString())
       throw createError('Lecturer is not authenticated to add attendance for this course!', 401);
 
     // check if student registered the course
