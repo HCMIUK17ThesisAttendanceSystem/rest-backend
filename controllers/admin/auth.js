@@ -49,17 +49,19 @@ exports.login = async (req, res, next) => {
     const isEqual = await bcrypt.compare(password, admin.password);
     if (!isEqual)
       throw createError('Wrong password D:', 401);
+
     const token = jwt.sign(
       {
         email: admin.email,
         userId: admin._id.toString()
       },
       'asecretprivatekey',
-      { expiresIn: '1h' }
+      { expiresIn: '5h' }
     );
     res.status(200).json({
       token,
-      userId: admin._id.toString()
+      userId: admin._id.toString(),
+      expireTime: 60 * 60 * 5000 // 5 hours
     });
   } catch (error) {
     errorHandler(req, error, next);
