@@ -6,7 +6,7 @@ const {
   errorHandler,
   createError
 } = require('../../util/error-handler');
-const { sendEmailWithTemplate } = require('../../util/mailer-example');
+const { sendEmailWithTemplate } = require('../../util/mailer');
 
 exports.createLecturer = async (req, res, next) => {
   try {

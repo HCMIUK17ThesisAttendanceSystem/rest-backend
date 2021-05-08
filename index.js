@@ -72,7 +72,7 @@ schedule.scheduleJob(
   '0 0 8 ? * SUN *',
   () => require('./util/schedule').sendWeeklyReport()
 );
-// require('./util/schedule').sendWeeklyReport();
+require('./util/schedule').sendWeeklyReport();
 
 mongoose.connect(
   mongooseUri,
