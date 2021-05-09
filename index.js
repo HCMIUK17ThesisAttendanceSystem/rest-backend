@@ -68,10 +68,9 @@ const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
 ));
 
 const autoSendWeeklyReport = schedule.scheduleJob(
-  '0 0 8 ? * SUN *',
+  '0 0 8 ? * MON *',
   () => require('./util/schedule').sendWeeklyReport()
 );
-
 
 mongoose.connect(
   mongooseUri,
@@ -92,7 +91,6 @@ mongoose.connect(
       });
     });
   })
-  .then(() => require('./util/schedule').sendWeeklyReport())
   // .then(async () => {
   //   const attendance = await Attendance.find({ note: { $exists: true } })
   //   console.log(attendance)

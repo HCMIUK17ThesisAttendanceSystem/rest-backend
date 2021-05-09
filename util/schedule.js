@@ -4,7 +4,10 @@ const io = require('./socket');
 const Course = require('../models/course');
 
 const { getCurrentPeriod } = require('./periods');
-const { getAttendanceAggregationGroupByLecturer } = require('./attendance-function');
+const {
+  getAttendanceAggregationGroupByLecturer,
+  getAttendanceAggregationGroupByStudent
+} = require('./attendance-function');
 const { sendEmailWithTemplate } = require('./mailer');
 
 exports.emitScheduledCourses = async (period) => {
@@ -47,9 +50,9 @@ exports.sendWeeklyReport = async () => {
   const dayLast = moment(lastday).format('MMM Do');
 
   // get attendance group by lecturer's courses for this week and last week
-  const attendanceAgg = await getAttendanceAggregationGroupByLecturer();
+  const lecturerEmailList = await getAttendanceAggregationGroupByLecturer();
   /*
-    attendanceAgg = [
+    lecturerEmailList = [
       {
         lecturerId,
         lecturerName,
@@ -75,7 +78,18 @@ exports.sendWeeklyReport = async () => {
       ...
     ]
   */
-  attendanceAgg.forEach(async a => {
-    await sendEmailWithTemplate('/lecturer-weekly-report.ejs', { ...a, dayFirst, dayLast }, 'ititiu17067@student.hcmiu.edu.vn', 'Presence Weekly Report');
-  })
+  lecturerEmailList.forEach((l, index) => {
+    console.log(`Sending weekly report to ${l.lecturerEmail}`);
+    setTimeout(() => {
+      sendEmailWithTemplate('/lecturer-weekly-report.ejs', { ...l, dayFirst, dayLast }, l.lecturerEmail, 'Presence Weekly Attendance Report');
+    }, index * 10000);
+  });
+
+  const studentEmailList = await getAttendanceAggregationGroupByStudent();
+  studentEmailList.forEach((s, index) => {
+    console.log(`Sending weekly report to ${s.studentEmail}`);
+    setTimeout(() => {
+      sendEmailWithTemplate('/student-weekly-report.ejs', { ...s }, s.studentEmail, 'Presence Weekly Attendance Report');
+    }, index * 10000);
+  });
 };

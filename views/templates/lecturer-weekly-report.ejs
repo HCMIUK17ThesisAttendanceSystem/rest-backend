@@ -1,12 +1,4 @@
 <style type="text/css">
-  #container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-
   table,
   th,
   td {
@@ -15,8 +7,12 @@
     text-align: left;
   }
 
-  thead {
+  th {
     background-color: aquamarine;
+  }
+
+  #textAlignRight {
+    text-align: right;
   }
 </style>
 
@@ -36,33 +32,37 @@
         <th>Room</th>
         <th>Student number</th>
         <th>This week attendance</th>
-        <th>Last week attendance</th>
+        <th>Previous week attendance</th>
       </tr>
     </thead>
     <tbody>
       <% courses.forEach(c=> { %>
         <tr>
-          <th>
+          <td>
             <%= c.subjectId %> - <%= c.subjectName %>
-          </th>
-          <th>
+          </td>
+          <td>
             <%= c.classType %>
-          </th>
-          <th>
-            <%= c.weekday %> (<%= c.periods[1] %> - <%= c.periods[c.periods.length - 1] %>)
-          </th>
-          <th>
+          </td>
+          <td>
+            <%= c.weekday %> (<%= c.periods[0] %> - <%= c.periods[c.periods.length - 1] %>)
+          </td>
+          <td>
             <%= c.roomCode %>
-          </th>
-          <th>
+          </td>
+          <td id="textAlignRight">
             <%= c.studentNumber %>
-          </th>
-          <th>
-            <%= c.attendances[c.attendances.length - 1].studentCount %>
-          </th>
-          <th>
-            <%= c.attendances[c.attendances.length - 2].studentCount %>
-          </th>
+          </td>
+          <td id="textAlignRight">
+            (<%= c.attendances[c.attendances.length - 1].date %>) <%= c.attendances[c.attendances.length -
+                1].studentCount %> - <%= Math.round(c.attendances[c.attendances.length - 1].studentCount /
+                  c.studentNumber * 100) %>%
+          </td>
+          <td id="textAlignRight">
+            (<%= c.attendances[c.attendances.length - 2].date %>) <%= c.attendances[c.attendances.length -
+                2].studentCount %> - <%= Math.round(c.attendances[c.attendances.length - 2].studentCount /
+                  c.studentNumber * 100) %>%
+          </td>
         </tr>
         <% }); %>
     </tbody>
@@ -73,6 +73,9 @@
   </a>
   <br />
   <p>Sincerely yours,</p>
-  <p>Presence</p>
+  <p>Presence.</p>
+  <i>---</i>
+  <i>This is automatic email. Please don't reply.</i>
+  <i>You are receiving this because you're a part of greater good :D</i>
   <!-- <img src="static/images/logo_invert.jpg" alt="PresenceLogo" /> -->
 </div>

@@ -5,6 +5,155 @@ const Attendance = require('../models/attendance');
 
 const { createError } = require('./error-handler');
 const convertToWeekday = require('./weekday-converter');
+const course = require('../models/course');
+const { check } = require('express-validator');
+
+exports.getAttendanceAggregationGroupByStudent = async () => {
+  const courses = await Course.find()
+    .select('subjectId weekday periods roomId classType')
+    .populate('subjectId', '-_id id name')
+    .populate('roomId', '-_id code');
+  const students = await Student.find()
+    .select('id name');
+
+  const resultPromises = courses.map(async course => {
+    const attendanceDateAgg = await Attendance.aggregate([
+      {
+        $match: {
+          courseId: course._id
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { date: "$createdAt", format: "%Y/%m/%d" }
+          }
+        }
+      },
+      {
+        $sort: {
+          _id: 1
+        }
+      },
+    ]);
+    return {
+      courseId: course._id,
+      checkDates: attendanceDateAgg.map(date => date._id)
+    };
+  });
+  const datesGroupByCourse = await Promise.all(resultPromises);
+  /*
+    datesGroupByCourse = [
+      { courseId, checkDates: ['YYYY/MM/DD']}
+    ]
+   */
+
+  const attendanceGrpByStudentCourseAgg = await Attendance.aggregate([
+    {
+      $group: {
+        _id: {
+          studentId: '$studentId',
+          courseId: '$courseId'
+        },
+        attendances: {
+          $push: {
+            date: { $dateToString: { format: "%Y/%m/%d", date: "$createdAt" } },
+            hour: { $dateToString: { format: "%H:%M", date: "$createdAt", timezone: 'Asia/Ho_Chi_Minh' } }
+          }
+        }
+      }
+    }
+  ]);
+  /*
+    attendanceGrpByStudentCourseAgg = [
+      {
+        _id: { courseId, studentId },
+        attendances: [{date, hour}]
+      }
+    ]
+   */
+
+  const flatAggregation = attendanceGrpByStudentCourseAgg.map(a => {
+    const fullDates = datesGroupByCourse.find(c => c.courseId.toString() === a._id.courseId.toString());
+    const fullAttendances = fullDates.checkDates.map(date => {
+      const checkDate = a.attendances.find(attendance => attendance.date === date);
+      return checkDate
+        ? {
+          date: checkDate.date.split('/').reverse().slice(0, -1).join('/'),
+          hour: checkDate.hour
+        }
+        : {
+          date: date.split('/').reverse().slice(0, -1).join('/'),
+          hour: null
+        };
+    });
+
+    return {
+      courseId: a._id.courseId,
+      studentId: a._id.studentId,
+      attendances: fullAttendances
+    };
+  });
+  /*
+    flatAggregation = [
+      {
+        courseId,
+        studentId,
+        attendances: [ { date, hour: null if not check } ]
+      }
+    ]
+   */
+
+  const reducedAggregationOnStudentId = flatAggregation.reduce((results, agg) => {
+    (results[agg.studentId] = results[agg.studentId] || []).push({
+      courseId: agg.courseId,
+      attendances: agg.attendances
+    });
+    return results;
+  }, {});
+  /*
+    reducedAggregationOnStudentId = {
+      'studentId': [
+        { courseId, attendances }
+      ]
+    }
+   */
+
+  let studentList = [];
+  for (const [key, values] of Object.entries(reducedAggregationOnStudentId)) {
+    // key: studentId; value: [ { courseId, attendances } ]
+    const student = students.find(s => s._id.toString() === key);
+    const attendCourses = values.map(v => {
+      const course = courses.find(c => c._id.toString() === v.courseId.toString());
+      return {
+        ...v,
+        subjectId: course.subjectId.id,
+        subjectName: course.subjectId.name,
+        roomCode: course.roomId.code,
+        periods: course.periods,
+        weekday: convertToWeekday(course.weekday),
+        classType: course.classType === '1' ? 'Laboratory' : 'Theory',
+        courseCode: `${course.classType === '1' ? 'Lab' : 'Theory'}-${course.subjectId.name}`,
+      };
+    });
+
+    studentList.push({
+      studentName: student.name.split(' ').slice(-2).join(' '),
+      studentId: student.id,
+      studentEmail: student.id + '@student.hcmiu.edu.vn',
+      courses: attendCourses
+    });
+  }
+  /*
+    studentList = [
+      {
+        studentName, Id, Email,
+        courses: [{ courseData, attendances }]
+      }
+    ]
+   */
+  return studentList;
+}
 
 exports.getAttendanceAggregationGroupByLecturer = async () => {
   // get lecturers' ids
@@ -41,7 +190,7 @@ exports.getAttendanceAggregationGroupByLecturer = async () => {
       ...a,
       _id: {
         ...a._id,
-        date: a._id.date.split('/').reverse().join('/')
+        date: a._id.date.split('/').reverse().slice(0, -1).join('/')
       }
     };
   });
@@ -93,7 +242,7 @@ exports.getAttendanceAggregationGroupByLecturer = async () => {
     const lecturer = await Lecturer.findById(value[0]).select('name email');
     return {
       lecturerId: lecturer._id,
-      lecturerName: lecturer.name,
+      lecturerName: lecturer.name.split(' ').slice(-2).join(' '),
       lecturerEmail: lecturer.email,
       courses: value[1]
     };

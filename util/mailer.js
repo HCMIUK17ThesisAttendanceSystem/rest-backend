@@ -66,20 +66,26 @@ const sendEmail = async (emailOptions) => {
 
 exports.sendEmailWithTemplate = async (viewPath, data, toEmails, subject) => {
   const path = rootDir + '/views/templates' + viewPath;
-  try {
-    const html = await ejs.renderFile(
-      path,
-      data,
-      { async: true }
-    );
-    const emailOptions = {
-      from: process.env.NODEMAILER_FROM_EMAIL,
-      to: toEmails,
-      subject,
-      html
-    };
-    sendEmail(emailOptions);
-  } catch (error) {
-    throw createError('Validation failed D:', 404, error);
+  let count = 0;
+  const maxTries = 5;
+  while (true) {
+    try {
+      const html = await ejs.renderFile(
+        path,
+        data,
+        { async: true }
+      );
+      const emailOptions = {
+        from: process.env.NODEMAILER_FROM_EMAIL,
+        to: toEmails,
+        subject,
+        html
+      };
+      await sendEmail(emailOptions);
+    } catch (error) {
+      console.log('Something went wrong while sending email to ' + toEmails);
+      if (++count === maxTries)
+        throw createError('Validation failed D:', 404, error);
+    }
   }
 }
