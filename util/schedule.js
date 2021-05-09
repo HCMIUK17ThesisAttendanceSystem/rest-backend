@@ -2,11 +2,10 @@ const moment = require('moment');
 const io = require('./socket');
 
 const Course = require('../models/course');
-const Student = require('../models/student');
-const Lecturer = require('../models/lecturer');
-const Attendance = require('../models/attendance');
+
 const { getCurrentPeriod } = require('./periods');
 const { getAttendanceAggregationGroupByLecturer } = require('./attendance-function');
+const { sendEmailWithTemplate } = require('./mailer');
 
 exports.emitScheduledCourses = async (period) => {
   const currWeekday = new Date().getDay().toString();
@@ -44,8 +43,8 @@ exports.sendWeeklyReport = async () => {
   const firstday = new Date(curr.setDate(first));
   const lastday = new Date(curr.setDate(last));
 
-  const day1st = moment(firstday).format('MMM Do');
-  const daylast = moment(lastday).format('MMM Do');
+  const dayFirst = moment(firstday).format('MMM Do');
+  const dayLast = moment(lastday).format('MMM Do');
 
   // get attendance group by lecturer's courses for this week and last week
   const attendanceAgg = await getAttendanceAggregationGroupByLecturer();
@@ -61,10 +60,11 @@ exports.sendWeeklyReport = async () => {
             subjectId,
             subjectName,
             roomCode,
-            periods: array,
+            periods: [int],
             weekday,
             classType,
-            attendance: [
+            studentNumber,
+            attendances: [
               { date, studentCount },
               ...
             ]
@@ -75,5 +75,7 @@ exports.sendWeeklyReport = async () => {
       ...
     ]
   */
-  
+  attendanceAgg.forEach(async a => {
+    await sendEmailWithTemplate('/lecturer-weekly-report.ejs', { ...a, dayFirst, dayLast }, 'ititiu17067@student.hcmiu.edu.vn', 'Presence Weekly Report');
+  })
 };

@@ -69,7 +69,7 @@ exports.getAttendanceAggregationGroupByLecturer = async () => {
     const resultPromises = Object.entries(reducedAggregationOnLecturerId[k]).map(async value => {
       // value[0]: courseId, value[1]: {date,studentCount}
       const course = await Course.findById(value[0])
-        .select('subjectId weekday periods roomId classType')
+        .select('subjectId weekday periods roomId classType regStudentIds')
         .populate('subjectId', '-_id id name')
         .populate('roomId', '-_id code');
       return {
@@ -78,9 +78,10 @@ exports.getAttendanceAggregationGroupByLecturer = async () => {
         subjectName: course.subjectId.name,
         roomCode: course.roomId.code,
         periods: course.periods,
+        studentNumber: course.regStudentIds.length,
         weekday: convertToWeekday(course.weekday),
         classType: course.classType === '1' ? 'Laboratory' : 'Theory',
-        attendance: value[1]
+        attendances: value[1]
       };
     });
     const results = await Promise.all(resultPromises);
@@ -97,7 +98,7 @@ exports.getAttendanceAggregationGroupByLecturer = async () => {
       courses: value[1]
     };
   });
-  
+
   const res = await Promise.all(resPromises);
 
   return res;

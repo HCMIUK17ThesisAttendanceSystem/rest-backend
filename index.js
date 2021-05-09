@@ -18,7 +18,6 @@ const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
 const mongooseUri = require('./util/database');
 const { periods } = require('./util/periods');
-const Attendance = require('./models/attendance');
 
 const app = express();
 
@@ -93,7 +92,7 @@ mongoose.connect(
       });
     });
   })
-  // .then(() => require('./util/schedule').sendWeeklyReport())
+  .then(() => require('./util/schedule').sendWeeklyReport())
   // .then(async () => {
   //   const attendance = await Attendance.find({ note: { $exists: true } })
   //   console.log(attendance)

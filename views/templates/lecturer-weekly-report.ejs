@@ -1,0 +1,78 @@
+<style type="text/css">
+  #container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  thead {
+    background-color: aquamarine;
+  }
+</style>
+
+<div id="container">
+  <p>
+    Hello <%= lecturerName %>,
+  </p>
+  <p>
+    Here is the weekly attendance report of your classes from <%= dayFirst %> to <%= dayLast %>.
+  </p>
+  <table width="100%">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Class type</th>
+        <th>Time</th>
+        <th>Room</th>
+        <th>Student number</th>
+        <th>This week attendance</th>
+        <th>Last week attendance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% courses.forEach(c=> { %>
+        <tr>
+          <th>
+            <%= c.subjectId %> - <%= c.subjectName %>
+          </th>
+          <th>
+            <%= c.classType %>
+          </th>
+          <th>
+            <%= c.weekday %> (<%= c.periods[1] %> - <%= c.periods[c.periods.length - 1] %>)
+          </th>
+          <th>
+            <%= c.roomCode %>
+          </th>
+          <th>
+            <%= c.studentNumber %>
+          </th>
+          <th>
+            <%= c.attendances[c.attendances.length - 1].studentCount %>
+          </th>
+          <th>
+            <%= c.attendances[c.attendances.length - 2].studentCount %>
+          </th>
+        </tr>
+        <% }); %>
+    </tbody>
+  </table>
+  <br />
+  <a href="https://hcmiu-presence.web.app">
+    See details
+  </a>
+  <br />
+  <p>Sincerely yours,</p>
+  <p>Presence</p>
+  <!-- <img src="static/images/logo_invert.jpg" alt="PresenceLogo" /> -->
+</div>
