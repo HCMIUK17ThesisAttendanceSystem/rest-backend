@@ -1,6 +1,6 @@
 const excel = require('exceljs');
 
-const { getAttendanceReport } = require('./util/attendance-function');
+const { getAttendanceReport } = require('../../util/attendance-function');
 // const { createAttendanceReport } = require('./util/excel-function');
 
 const { errorHandler, createError } = require('../../util/error-handler');

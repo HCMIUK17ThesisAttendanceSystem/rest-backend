@@ -6,6 +6,7 @@ const Student = require('../models/student');
 const Lecturer = require('../models/lecturer');
 const Attendance = require('../models/attendance');
 const { getCurrentPeriod } = require('./periods');
+const { getAttendanceAggregationGroupByLecturer } = require('./attendance-function');
 
 exports.emitScheduledCourses = async (period) => {
   const currWeekday = new Date().getDay().toString();
@@ -47,63 +48,32 @@ exports.sendWeeklyReport = async () => {
   const daylast = moment(lastday).format('MMM Do');
 
   // get attendance group by lecturer's courses for this week and last week
-  // get lecturers' ids
-  const lecturers = await Lecturer.find().select('_id name courseIds');
-
-  const attendanceGrpByDateCourseAgg = await Attendance.aggregate([
-    {
-      $group: {
-        _id: {
-          date: { $dateToString: { format: "%Y/%m/%d", date: "$createdAt" } },
-          courseId: '$courseId'
-        },
-        studentCount: {
-          $sum: 1
-          // or $push: '$studentId'
-        }
-      }
-    },
-    {
-      $sort: {
-        _id: 1
-      }
-    },
-  ]);
-  const attendanceGrpByDateCourseLecturer = attendanceGrpByDateCourseAgg.map(a => {
-    const lecturerId = lecturers.find(l => l.courseIds.includes(a._id.courseId))._id;
-    return {
-      ...a,
-      lecturerId
-    };
-  });
-  const attendanceAggregation = attendanceGrpByDateCourseLecturer.map(a => {
-    return {
-      ...a,
-      _id: {
-        ...a._id,
-        date: a._id.date.split('/').reverse().join('/')
-      }
-    };
-  });
-
-  const reducedAggregationOnLecturerId = attendanceAggregation.reduce((results, agg) => {
-    (results[agg.lecturerId] = results[agg.lecturerId] || []).push({
-      date: agg._id.date,
-      courseId: agg._id.courseId,
-      studentCount: agg.studentCount
-    });
-    return results;
-  }, {});
-
-  for (const [key, value] of Object.entries(reducedAggregationOnLecturerId)) {
-    reducedAggregationOnLecturerId[key] = value.reduce((results, agg) => {
-      (results[agg.courseId] = results[agg.courseId] || []).push({
-        date: agg.date,
-        studentCount: agg.studentCount
-      });
-      return results;
-    }, {})
-    console.log(reducedAggregationOnLecturerId[key]);
-  }
-  console.log(reducedAggregationOnLecturerId);
+  const attendanceAgg = await getAttendanceAggregationGroupByLecturer();
+  /*
+    attendanceAgg = [
+      {
+        lecturerId,
+        lecturerName,
+        lecturerEmail,
+        courses: [
+          {
+            courseId,
+            subjectId,
+            subjectName,
+            roomCode,
+            periods: array,
+            weekday,
+            classType,
+            attendance: [
+              { date, studentCount },
+              ...
+            ]
+          },
+          ...
+        ]
+      },
+      ...
+    ]
+  */
+  
 };

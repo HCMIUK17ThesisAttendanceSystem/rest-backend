@@ -68,11 +68,11 @@ const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
   () => require('./util/schedule').emitScheduledCourses(period.number)
 ));
 
-schedule.scheduleJob(
+const autoSendWeeklyReport = schedule.scheduleJob(
   '0 0 8 ? * SUN *',
   () => require('./util/schedule').sendWeeklyReport()
 );
-require('./util/schedule').sendWeeklyReport();
+
 
 mongoose.connect(
   mongooseUri,
@@ -93,6 +93,7 @@ mongoose.connect(
       });
     });
   })
+  // .then(() => require('./util/schedule').sendWeeklyReport())
   // .then(async () => {
   //   const attendance = await Attendance.find({ note: { $exists: true } })
   //   console.log(attendance)

@@ -4,7 +4,7 @@ const Student = require('../../models/student');
 const Attendance = require('../../models/attendance');
 
 const { getCurrentPeriod } = require('../../util/periods');
-const { getAttendanceReport } = require('./util/attendance-function');
+const { getAttendanceReport } = require('../../util/attendance-function');
 const {
   errorHandler,
   createError
@@ -49,7 +49,6 @@ exports.getCurrentCourse = async (req, res, next) => {
     if (currentPeriod) {
       const currentCourse = await Course.findOne({
         lecturerId: req.userId,
-        // lecturerId: '6046d67ffa42780004beaaa7',
         periods: currentPeriod,
         weekday: currentWeekday
       })
