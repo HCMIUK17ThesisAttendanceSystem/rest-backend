@@ -67,10 +67,12 @@ const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
   () => require('./util/schedule').emitScheduledCourses(period.number)
 ));
 
-schedule.scheduleJob(
-  '0 0 11 ? * MON *',
-  () => require('./util/schedule').sendWeeklyReport()
-);
+const emailSchedule = ['0 30 11 ? * MON *'].forEach(cron => {
+  schedule.scheduleJob(
+    cron,
+    () => require('./util/schedule').sendWeeklyReport()
+  )
+});
 
 mongoose.connect(
   mongooseUri,
