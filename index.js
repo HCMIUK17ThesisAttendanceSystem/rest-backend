@@ -67,7 +67,7 @@ const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
   () => require('./util/schedule').emitScheduledCourses(period.number)
 ));
 
-const emailSchedule = ['25 11 * * MON'].forEach(cron => {
+const emailSchedule = ['00 08 * * SUN'].forEach(cron => {
   schedule.scheduleJob(
     cron,
     () => require('./util/schedule').sendWeeklyReport()
