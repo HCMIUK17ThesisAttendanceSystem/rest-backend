@@ -67,8 +67,8 @@ const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
   () => require('./util/schedule').emitScheduledCourses(period.number)
 ));
 
-const autoSendWeeklyReport = schedule.scheduleJob(
-  '0 0 8 ? * MON *',
+schedule.scheduleJob(
+  '0 0 11 ? * MON *',
   () => require('./util/schedule').sendWeeklyReport()
 );
 
@@ -91,6 +91,7 @@ mongoose.connect(
       });
     });
   })
+  // .then(() => require('./util/schedule').sendWeeklyReport())
   // .then(async () => {
   //   const attendance = await Attendance.find({ note: { $exists: true } })
   //   console.log(attendance)
