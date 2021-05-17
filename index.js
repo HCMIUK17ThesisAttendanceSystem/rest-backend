@@ -63,7 +63,7 @@ app.use((req, res) => {
   }
 });
 
-const emailSchedule = ['0 0/28 1-3 ? * TUE *'].forEach(cron =>
+const awakeSchedule = ['0 0/28 1-3 ? * TUE *'].forEach(cron =>
   schedule.scheduleJob(
     cron,
     () => AwakeHeroku.start()
