@@ -12,7 +12,9 @@ const compression = require('compression'); // compress sent data to reduce work
 const morgan = require('morgan');           // logging
 const cors = require('cors');
 // const csrf = require('csurf');
+const { AwakeHeroku } = require("awake-heroku");
 
+AwakeHeroku.add('https://hcmiu-presence.herokuapp.com');
 const adminRoutes = require('./routes/admin');
 const lecturerRoutes = require('./routes/lecturer');
 const readerRoutes = require('./routes/reader');
@@ -31,7 +33,6 @@ app.use(compression());
 app.use(morgan('combined', { stream: accessLogStream }));
 app.use(cors());
 
-// app.use(bodyParser.urlencoded()) // x-www-form-urlencoded <form>
 app.use(bodyParser.json()) // application/json
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
@@ -62,17 +63,26 @@ app.use((req, res) => {
   }
 });
 
-const emitCourseSchedule = periods.forEach(period => schedule.scheduleJob(
-  period.cron,
-  () => require('./util/schedule').emitScheduledCourses(period.number)
-));
+const emailSchedule = ['0 0/28 1-3 ? * TUE *'].forEach(cron =>
+  schedule.scheduleJob(
+    cron,
+    () => AwakeHeroku.start()
+  )
+);
 
-const emailSchedule = ['00 08 * * SUN'].forEach(cron => {
+const emitCourseSchedule = periods.forEach(period =>
+  schedule.scheduleJob(
+    period.cron,
+    () => require('./util/schedule').emitScheduledCourses(period.number)
+  )
+);
+
+const emailSchedule = ['30 02 * * TUE'].forEach(cron =>
   schedule.scheduleJob(
     cron,
     () => require('./util/schedule').sendWeeklyReport()
   )
-});
+);
 
 mongoose.connect(
   mongooseUri,
