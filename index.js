@@ -63,7 +63,7 @@ app.use((req, res) => {
   }
 });
 
-const awakeSchedule = ['0 0/28 7-16 ? * * *'].forEach(cron =>
+const awakeSchedule = ['0 0/28 7-16 ? * MON,TUE,WED,THU,FRI,SAT *'].forEach(cron =>
   schedule.scheduleJob(
     cron,
     () => AwakeHeroku.start()
@@ -77,7 +77,7 @@ const emitCourseSchedule = periods.forEach(period =>
   )
 );
 
-const emailSchedule = ['30 07 * * SUN'].forEach(cron =>
+const emailSchedule = ['30 07 * * MON'].forEach(cron =>
   schedule.scheduleJob(
     cron,
     () => require('./util/schedule').sendWeeklyReport()
