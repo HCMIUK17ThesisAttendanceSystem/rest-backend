@@ -62,7 +62,7 @@ const sendEmail = async (emailOptions) => {
       console.log(error);
     }
     else
-      console.log(info);
+      console.log('Send to: ' + info.accepted[0] + '; Response: ' + info.response);
   });
 };
 
