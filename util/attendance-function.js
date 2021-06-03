@@ -5,8 +5,6 @@ const Attendance = require('../models/attendance');
 
 const { createError } = require('./error-handler');
 const convertToWeekday = require('./weekday-converter');
-const course = require('../models/course');
-const { check } = require('express-validator');
 
 exports.getAttendanceAggregationGroupByStudent = async () => {
   const courses = await Course.find()
@@ -292,9 +290,10 @@ exports.getAttendanceReport = async (courseId) => {
     {
       $group: {
         _id: "$studentId",
-        attendDates: {
+        attendances: {
           $addToSet: {
-            $dateToString: { date: "$createdAt", format: "%d/%m/%Y" },
+            date: { $dateToString: { date: "$createdAt", format: "%d/%m/%Y" } },
+            hour: { $dateToString: { format: "%H:%M", date: "$createdAt", timezone: 'Asia/Ho_Chi_Minh' } }
           }
         }
       }
@@ -307,8 +306,9 @@ exports.getAttendanceReport = async (courseId) => {
   const studentAttendances = populatedAttendances.map(a => {
     let attendances = [];
     dates.forEach(date => {
-      if (a.attendDates.includes(date))
-        attendances.push(true);
+      let isAttend = a.attendances.find(a => a.date === date)
+      if (isAttend)
+        attendances.push(isAttend.hour);
       else
         attendances.push(false);
     });

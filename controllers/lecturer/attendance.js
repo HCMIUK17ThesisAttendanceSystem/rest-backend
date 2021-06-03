@@ -44,6 +44,7 @@ exports.downloadAttendanceReport = async (req, res, next) => {
       header: date,
       key: index + ''
     }));
+    columns.push({ header: 'Total Absence', key: 'totalAbsence' });
     worksheet.columns = columns;
 
     // Formatting headers
@@ -52,23 +53,33 @@ exports.downloadAttendanceReport = async (req, res, next) => {
     worksheet.columns.forEach(column => {
       column.width = column.key === 'studentName'
         ? studentNameColWidth
-        : (column.header.length < 12 ? 12 : column.header.length + 10)
+        : (column.header.length < 14 ? 14 : column.header.length + 10)
     });
     // Make the header bold.
     worksheet.getRow(1).font = { bold: true };
 
     // Dump all the data into Excel
     studentAttendances.forEach((data, idx) => {
-      const results = data.attendances.map(a => a ? 'x' : '');
+      const totalAbsence = data.attendances.filter(a => a === false).length;
+      const attendances = data.attendances.map(a => a ? a : '');
       const index = idx + 1;
       const row = {
         index,
         studentId: data.id,
         studentName: data.name,
-        ...results
+        ...attendances,
+        totalAbsence
       };
       worksheet.addRow(row);
     });
+
+    // align id column to right
+    worksheet.getColumn(2).alignment = { horizontal: 'right' };
+    // align date columns to right
+    let colIndex = 4;
+    for (colIndex; colIndex <= worksheet.rowCount; colIndex++) {
+      worksheet.getColumn(colIndex).alignment = { horizontal: 'right' };
+    }
 
     // Send response
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
