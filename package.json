@@ -23,7 +23,7 @@
   "homepage": "https://github.com/HCMIUK17ThesisAttendanceSystem/rest-backend#readme",
   "devDependencies": {
     "dotenv": "^8.2.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.20"
   },
   "dependencies": {
     "awake-heroku": "^2.0.8",
